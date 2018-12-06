@@ -1,1 +1,14 @@
 .Rproj.user
+*csv
+*png
+*docx
+.Rhistory
+.RData
+.Ruserdata
+out/
+Appendix.Rmd
+initial_vis/
+wqo_shuswap.Rproj
+Raw_Data/
+*xlsx
+data
