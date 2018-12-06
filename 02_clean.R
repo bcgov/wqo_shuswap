@@ -33,20 +33,25 @@ shuswap_TP <- filter(shuswap_df, PARAMETER == "Phosphorus Total")
 # Change units from mg/L to ug/L
 shuswap_TP <- transform(shuswap_TP, RESULT = RESULT*1000)
 colnames(shuswap_TP)[6] <- "RESULT_ugL"
+#shuswap_TP <- select(shuswap_TP, -UNIT)
 
 sites <- c("E206771", "0500124", "E208723", "0500123")
-sites_P <- filter(shuswap_TP, MONITORING_LOCATION  %in% sites)
+
+sites_P <- filter(shuswap_TP, MONITORING_LOCATION %in% sites)
 
 for (s in sites){
   P_plots <- filter(sites_P, Sites == s)
-  plot <- ggplot(shuswap_TP, aes(x = COLLECTION_START, y = RESULT_ugL)) +
-  geom_point() +
-  facet_wrap(PARAMETER ~ EMS_ID, scales = "free_y")
-  plot(plot)
+  plotpoint <- ggplot(P_plots, aes(x = COLLECTION_START, y = RESULT_ugL)) +
+  geom_point()
+  plot(plotpoint)
 }
 
+
+
+## CLEANING UP SITE 0500123 - SORRENTO
+##
 ## Remove 4 rows of 8/21/2002 and 2/11/2003 that look like they were entered wrong at 100 ug/L. They are entered twice, the second entry at < MDL of 2 ug/L which makes more sense.
-shuswap_TP <- filter(shuswap_TP, RESULT != 100)
+shuswap_TP_0500123 <- filter(shuswap_TP, EMS_ID == "0500123", RESULT_ugL != 100)
 ##
 ## Remove value of 20 (has a < so supposed to be <MDL)
 ##
@@ -67,7 +72,14 @@ shuswap_TP <- filter(shuswap_TP, RESULT != 100)
 ##### SECCHI DEPTH ######
 
 ##### E. coli #####
-#####
+
+
+# BOXPLOT
+plotbox <- ggplot(shuswap_TP, aes(x = MONITORING_LOCATION, y = RESULT_ugL)) +
+#facet_wrap(PARAMETER ~ EMS_ID, scales = "free_y")
+geom_boxplot()
+plot(plotbox)
+
 ## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
 #write.csv(shuswap_TP,
 #'C:/R Projects/wqo_shuswap/data/TP_shuswap.csv', row.names = FALSE)
