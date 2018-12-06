@@ -16,8 +16,8 @@
 ## install.packages("package name") if not already installed
 
 library(devtools)
-install_github("bcgov/rems")
-install_github("bcgov/wqbc")
+#install_github("bcgov/rems")
+#install_github("bcgov/wqbc")
 library(rems)
 library(dplyr)
 library(ggplot2)
@@ -61,3 +61,7 @@ filtered_historic2 <- collect(filtered_historic2) %>%
 #glimpse(filtered_historic2)
 
 all_data_shuswap <- bind_ems_data(filtered_twoyear, filtered_historic2)
+
+## CREATE CSV OF ALL RAW DATA
+#write.csv(shuswap_df,
+#'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
