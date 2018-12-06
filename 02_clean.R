@@ -58,19 +58,15 @@ for (s in sites){
 ## Average values per day
 ##
 ##### NITROGEN #####
-#####
-#####
-#####
-#####
+
 ##### DISSOLVED OXYGEN #####
-#####
-#####
-#####
+
 ##### CHLOROPHYLL A
-#####
-#####
-#####
+
 ##### SECCHI DEPTH ######
+
+##### E. coli #####
+#####
 ## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
 write.csv(shuswap_df,
 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
