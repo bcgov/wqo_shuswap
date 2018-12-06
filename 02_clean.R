@@ -46,6 +46,7 @@ for (s in sites){
 }
 
 ## Remove 4 rows of 8/21/2002 and 2/11/2003 that look like they were entered wrong at 100 ug/L. They are entered twice, the second entry at < MDL of 2 ug/L which makes more sense.
+shuswap_TP <- filter(shuswap_TP, RESULT != 100)
 ##
 ## Remove value of 20 (has a < so supposed to be <MDL)
 ##
@@ -68,8 +69,5 @@ for (s in sites){
 ##### E. coli #####
 #####
 ## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
-write.csv(shuswap_df,
-'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
-
-write.csv(shuswap_TP,
-'C:/R Projects/wqo_shuswap/data/TP_shuswap.csv', row.names = FALSE)
+#write.csv(shuswap_TP,
+#'C:/R Projects/wqo_shuswap/data/TP_shuswap.csv', row.names = FALSE)
