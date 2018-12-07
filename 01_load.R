@@ -36,7 +36,7 @@ filtered_twoyear <- filter_ems_data(twoyear,
                                     #from_date = "2011/05/06",
                                     to_date = "2018/12/04")
 
-# Remove_data_cache("2yr")
+#remove_data_cache("2yr")
 
 # DOWNLOAD HISTORIC DATA - JUST HAVE TO RUN THIS CODE ONCE
 #download_historic_data(ask = FALSE)
@@ -64,4 +64,7 @@ all_data_shuswap <- bind_ems_data(filtered_twoyear, filtered_historic2)
 
 # CREATE CSV OF ALL RAW DATA
 #write.csv(shuswap_df,
-#'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
+#'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE'
+
+# Just load csv each time so don't have to download from EMS. Ensures dataset remains consistent.
+read.csv("all_data_shuswap")
