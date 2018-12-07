@@ -11,20 +11,19 @@
 # See the License for the specific language governing permissions and limitations under the License.
 #
 # View and filter out non water samples
-# Don't want to use clean_wqdata function as this is for lake data with varying depths per day, and the clean function averages multiple daily
-# measurments.
+# Don't want to use clean_wqdata function as this is for lake data with varying depths per day, and the clean function averages multiple daily measurments.
 distinct(all_data_shuswap, SAMPLE_STATE)
 shuswap_clean <- filter(all_data_shuswap, SAMPLE_STATE == "Fresh Water")
 
-## View and remove blanks
+# View and remove blanks
 distinct(all_data_shuswap, SAMPLE_CLASS)
 shuswap_clean <- filter(shuswap_clean, SAMPLE_CLASS != "Blank - field")
 
-## Refine dataframe (df) to include a subset of columns for simplified viewing analysis
+# Refine dataframe (df) to include a subset of columns for simplified viewing analysis
 shuswap_df <- select(shuswap_clean, EMS_ID, MONITORING_LOCATION, COLLECTION_START, PARAMETER, RESULT_LETTER, RESULT, UNIT, SAMPLE_CLASS, UPPER_DEPTH, LOWER_DEPTH)
 
-## You can create a list of any column if you want
-#parameters <- distinct(shuswap_df, MONITORING_SITE = "", PARAMETER)
+# You can create a summary list of any column
+#parameters <- distinct(shuswap_df, MONITORING_SITE = "0500123", PARAMETER)
 
 ##### PHOSPHORUS #####
 # Initial Visualization
@@ -33,7 +32,9 @@ shuswap_TP <- filter(shuswap_df, PARAMETER == "Phosphorus Total")
 # Change units from mg/L to ug/L
 shuswap_TP <- transform(shuswap_TP, RESULT = RESULT*1000)
 colnames(shuswap_TP)[6] <- "RESULT_ugL"
-#shuswap_TP <- select(shuswap_TP, -UNIT)
+
+#Get rid of UNIT column which says 'mg/L'
+shuswap_TP <- select(shuswap_TP, -UNIT)
 
 sites <- c("E206771", "0500124", "E208723", "0500123")
 
@@ -50,23 +51,21 @@ for (s in sites){
   plot(plotpoint)
 }
 
+# CLEANING UP SITE 0500123 - SORRENTO
 
+# Remove 4 rows of 8/21/2002 and 2/11/2003 that look like they were entered wrong at 100 ug/L. They are entered twice, the second entry at < MDL of 2 ug/L which makes more sense.
+# Remove value of 20 (has a < so supposed to be <MDL)
+# Include surface samples only (it's just most recent data that have deep water samples)
 
-## CLEANING UP SITE 0500123 - SORRENTO
-##
-## Remove 4 rows of 8/21/2002 and 2/11/2003 that look like they were entered wrong at 100 ug/L. They are entered twice, the second entry at < MDL of 2 ug/L which makes more sense.
-shuswap_TP_0500123 <- filter(shuswap_TP, EMS_ID == "0500123", RESULT_ugL != 100)
-##
-## Remove value of 20 (has a < so supposed to be <MDL)
-##
-## Change format of the date to remove time
+shuswap_TP_0500123 <- filter(shuswap_TP, EMS_ID == "0500123")
+shuswap_TP_0500123 <- shuswap_TP_0500123[-c(2,4,6,8,25,142,173,198), ]
 
-## Separate df into growing season (May - October) and non-growing season (November to April)
-##
-## Include surface samples only (it's just most recent data that have deep water samples)
-##
-## Average values per day
-##
+# Change format of the date to remove time
+
+# Separate df into growing season (May - October) and non-growing season (November to April)
+
+# Average values per day
+#
 ##### NITROGEN #####
 
 ##### DISSOLVED OXYGEN #####
