@@ -37,12 +37,16 @@ colnames(shuswap_TP)[6] <- "RESULT_ugL"
 
 sites <- c("E206771", "0500124", "E208723", "0500123")
 
-sites_P <- filter(shuswap_TP, MONITORING_LOCATION %in% sites)
+# Don't need this I don't think as df only contains the 4 sites I'm wanting to plot
+#sites_P <- filter(shuswap_TP, EMS_ID %in% sites)
 
 for (s in sites){
-  P_plots <- filter(sites_P, Sites == s)
+  P_plots <- filter(shuswap_TP, EMS_ID == s)
   plotpoint <- ggplot(P_plots, aes(x = COLLECTION_START, y = RESULT_ugL)) +
-  geom_point()
+  geom_point() +
+  ggtitle(s) +
+  xlab("Date") +
+  ylab("Total Phosphorus (ug/L)")
   plot(plotpoint)
 }
 
