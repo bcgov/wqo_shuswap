@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 #
 # View and filter out non water samples
-# # Don't want to use clean_wqdata function as this is for lake data with varying depths per day, and the clean function averages multiple daily measurments.
+# Don't want to use clean_wqdata function as this is for lake data with varying depths per day, and the clean function averages multiple daily measurments.
 # distinct(all_data_shuswap, SAMPLE_STATE)
 # shuswap_clean <- filter(all_data_shuswap, SAMPLE_STATE == "Fresh Water")
 #
@@ -23,14 +23,14 @@
 # shuswap_df <- select(shuswap_clean, EMS_ID, MONITORING_LOCATION, COLLECTION_START, PARAMETER, RESULT_LETTER, RESULT, UNIT, SAMPLE_CLASS, UPPER_DEPTH, LOWER_DEPTH)
 #
 # # You can create a summary list of any column
-# parameters <- distinct(shuswap_df, MONITORING_SITE = "0500123", PARAMETER)
+# distinct(shuswap_df, MONITORING_SITE = "0500123", PARAMETER)
 # #
 # # CREATE CSV OF ALL RAW CLEAN DATA
 # write.csv(shuswap_df, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
 
 # Just load csv each time so don't have to download from EMS. Ensures dataset remains consistent.
+library(readr)
 all_data_shuswap <- read_csv("data/all_data_shuswap.csv")
-
 
 ##### PHOSPHORUS #####
 # Initial Visualization
