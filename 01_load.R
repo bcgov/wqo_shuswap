@@ -62,9 +62,3 @@ filtered_historic2 <- collect(filtered_historic2) %>%
 
 all_data_shuswap <- bind_ems_data(filtered_twoyear, filtered_historic2)
 
-# CREATE CSV OF ALL RAW DATA
-#write.csv(shuswap_df,
-#'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE'
-
-# Just load csv each time so don't have to download from EMS. Ensures dataset remains consistent.
-read.csv("all_data_shuswap")
