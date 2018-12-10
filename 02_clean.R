@@ -11,23 +11,30 @@
 # See the License for the specific language governing permissions and limitations under the License.
 #
 # View and filter out non water samples
-# Don't want to use clean_wqdata function as this is for lake data with varying depths per day, and the clean function averages multiple daily measurments.
-distinct(all_data_shuswap, SAMPLE_STATE)
-shuswap_clean <- filter(all_data_shuswap, SAMPLE_STATE == "Fresh Water")
+# # Don't want to use clean_wqdata function as this is for lake data with varying depths per day, and the clean function averages multiple daily measurments.
+# distinct(all_data_shuswap, SAMPLE_STATE)
+# shuswap_clean <- filter(all_data_shuswap, SAMPLE_STATE == "Fresh Water")
+#
+# # View and remove blanks
+# distinct(all_data_shuswap, SAMPLE_CLASS)
+# shuswap_clean <- filter(shuswap_clean, SAMPLE_CLASS != "Blank - field")
+#
+# # Refine dataframe (df) to include a subset of columns for simplified viewing analysis
+# shuswap_df <- select(shuswap_clean, EMS_ID, MONITORING_LOCATION, COLLECTION_START, PARAMETER, RESULT_LETTER, RESULT, UNIT, SAMPLE_CLASS, UPPER_DEPTH, LOWER_DEPTH)
+#
+# # You can create a summary list of any column
+# parameters <- distinct(shuswap_df, MONITORING_SITE = "0500123", PARAMETER)
+# #
+# # CREATE CSV OF ALL RAW CLEAN DATA
+# write.csv(shuswap_df, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
 
-# View and remove blanks
-distinct(all_data_shuswap, SAMPLE_CLASS)
-shuswap_clean <- filter(shuswap_clean, SAMPLE_CLASS != "Blank - field")
+# Just load csv each time so don't have to download from EMS. Ensures dataset remains consistent.
+all_data_shuswap <- read_csv("data/all_data_shuswap.csv")
 
-# Refine dataframe (df) to include a subset of columns for simplified viewing analysis
-shuswap_df <- select(shuswap_clean, EMS_ID, MONITORING_LOCATION, COLLECTION_START, PARAMETER, RESULT_LETTER, RESULT, UNIT, SAMPLE_CLASS, UPPER_DEPTH, LOWER_DEPTH)
-
-# You can create a summary list of any column
-#parameters <- distinct(shuswap_df, MONITORING_SITE = "0500123", PARAMETER)
 
 ##### PHOSPHORUS #####
 # Initial Visualization
-shuswap_TP <- filter(shuswap_df, PARAMETER == "Phosphorus Total")
+shuswap_TP <- filter(all_data_shuswap, PARAMETER == "Phosphorus Total")
 
 # Change units from mg/L to ug/L
 shuswap_TP <- transform(shuswap_TP, RESULT = RESULT*1000)
@@ -53,7 +60,7 @@ for (s in sites){
 
 # CLEANING UP SITE 0500123 - SORRENTO
 
-# Remove 4 rows of 8/21/2002 and 2/11/2003 that look like they were entered wrong at 100 ug/L. They are entered twice, the second entry at < MDL of 2 ug/L which makes more sense.
+# Remove 4 rows of 8/21/2002 and 2/11/2003 that look like they were entered wrong at 100 ug/L. According to Kevin, these are likely metals results that got lumped into the P test results. These days are entered twice, the second entry at < MDL of 2 ug/L which would be the P MDL.
 # Remove value of 20 (has a < so supposed to be <MDL)
 # Include surface samples only (it's just most recent data that have deep water samples)
 
@@ -61,8 +68,10 @@ shuswap_TP_0500123 <- filter(shuswap_TP, EMS_ID == "0500123")
 shuswap_TP_0500123 <- shuswap_TP_0500123[-c(2,4,6,8,25,142,173,198), ]
 
 # Change format of the date to remove time
+shuswap_TP_0500123$COLLECTION_START <- as.Date(shuswap_TP_0500123$COLLECTION_START, "%m-%d-%Y")
 
 # Separate df into growing season (May - October) and non-growing season (November to April)
+shuswap_TP_0500123$Month <- as.numeric(substring(shuswap_TP_0500123$COLLECTION_START, first = 05, last = 10))
 
 # Average values per day
 #
