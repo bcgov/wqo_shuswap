@@ -68,7 +68,7 @@ shuswap_TP_0500123 <- filter(shuswap_TP, EMS_ID == "0500123")
 shuswap_TP_0500123 <- shuswap_TP_0500123[-c(2,4,6,8,25,142,173,198), ]
 
 # Change format of the date to remove time
-shuswap_TP_0500123$COLLECTION_START <- as.Date(shuswap_TP_0500123$COLLECTION_START, "%m-%d-%Y")
+shuswap_TP_0500123$COLLECTION_START <- as.Date(shuswap_TP_0500123$COLLECTION_START, tz = "PST", "%m-%d-%Y")
 
 # Separate df into growing season (May - October) and non-growing season (November to April)
 shuswap_TP_0500123$Month <- as.numeric(substring(shuswap_TP_0500123$COLLECTION_START, first = 05, last = 10))
@@ -93,5 +93,5 @@ geom_boxplot()
 plot(plotbox)
 
 ## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
-#write.csv(shuswap_TP,
+#write.csv(shuswap_TP_0500123,
 #'C:/R Projects/wqo_shuswap/data/TP_shuswap.csv', row.names = FALSE)
