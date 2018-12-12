@@ -33,14 +33,20 @@ Variables <- distinct(shuswap_tidy, Station = "0500123", Variable)
 ## Initial Visualization
 shuswap_TP <- filter(shuswap_tidy, Variable == "Phosphorus Total")
 
-## Change units from mg/L to ug/L
-shuswap_TP <- transform(shuswap_TP, Value = Value*1000)
-colnames(shuswap_TP)[6] <- "Value_ugL"
+## Plot all sites together for an intial view of the data
+sites <- c("E206771", "0500124", "E208723", "0500123")
 
-## Delete'Units' column which says 'mg/L'
-## Delete 'DetectionLimit' column which is in mg/L
-shuswap_TP <- select(shuswap_TP, -Units)
-#shuswap_TP <- select(shuswap_TP, -DetectionLimit)
+# Don't need this I don't think as df only contains the 4 sites I'm wanting to plot
+#sites_P <- filter(shuswap_TP, EMS_ID %in% sites)
+for (s in sites){
+  P_plots <- filter(shuswap_TP, EMS_ID == s)
+  plotpoint <- ggplot(P_plots, aes(x = DateTime, y = Value)) +
+  geom_point() +
+  ggtitle(s) +
+  xlab("Date") +
+  ylab("Total Phosphorus (mg/L)")
+  plot(plotpoint)
+}
 
 ## CLEANING UP SITE 0500123 - SORRENTO
 ## Filter out site df
@@ -50,41 +56,29 @@ shuswap_TP <- select(shuswap_TP, -Units)
 shuswap_TP_0500123 <- filter(shuswap_TP, EMS_ID == "0500123")
 shuswap_TP_0500123 <- shuswap_TP_0500123[-c(2,4,6,8,25,118,141,172,197), ]
 
-## Change format of the date to remove time
-shuswap_TP_0500123$DateTime <- as.Date(shuswap_TP_0500123$DateTime, format = "%Y %m %d")
-clean_0500123_TP <- clean_wqdata(shuswap_TP_0500123, by = "EMS_ID", max_cv = Inf, sds = 10, ignore_undetected = TRUE, large_only = TRUE, delete_outliers = TRUE, remove_blanks = TRUE, messages = TRUE)
+## Clean function averages daily samples from 201 to 101 rows, removes columns: sample state, sample descriptor, sample class, location type, upper depth and lower depth.
+clean_TP_0500123 <- clean_wqdata(shuswap_TP_0500123, by = "EMS_ID", delete_outliers = TRUE, remove_blanks = TRUE)
 
+## Change units from mg/L to ug/L
+clean_TP_0500123 <- transform(clean_TP_0500123, Value = Value*1000)
+colnames(clean_TP_0500123)[4] <- "Value_ugL"
 
-sites <- c("E206771", "0500124", "E208723", "0500123")
+## Delete'Units' column which says 'mg/L'
+## Delete 'DetectionLimit' column which is in mg/L
+clean_TP_0500123 <- select(clean_TP_0500123, -Units)
+clean_TP_0500123 <- select(clean_TP_0500123, -DetectionLimit)
 
-# Don't need this I don't think as df only contains the 4 sites I'm wanting to plot
-#sites_P <- filter(shuswap_TP, EMS_ID %in% sites)
+## Separate df into growing season (May - October) and non-growing season (November to April)
+clean_TP_0500123$Month <- as.character(format(clean_TP_0500123$Date, '%b'))
+clean_TP_0500123_gs <- filter(clean_TP_0500123, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sept"| Month == "Oct")
 
-for (s in sites){
-  P_plots <- filter(shuswap_TP, EMS_ID == s)
-  plotpoint <- ggplot(P_plots, aes(x = COLLECTION_START, y = RESULT_ugL)) +
-  geom_point() +
-  ggtitle(s) +
-  xlab("Date") +
-  ylab("Total Phosphorus (ug/L)")
-  plot(plotpoint)
-}
-
-
-
-# Separate df into growing season (May - October) and non-growing season (November to April)
-shuswap_TP_0500123$Month <- as.character(format(shuswap_TP_0500123$COLLECTION_START, '%b'))
-shuswap_TP_0500123_gs <- filter(shuswap_TP_0500123, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sept"| Month == "Oct")
-
-# PLOT GROWING SEASON MEANS
-plotbox <- ggplot(shuswap_TP, aes(x = MONITORING_LOCATION, y = RESULT_ugL)) +
-#facet_wrap(PARAMETER ~ EMS_ID, scales = "free_y")
-geom_boxplot()
-plot(plotbox)
+## Average by month
+## The only month that there is two samples from is June 2015
 
 ## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
-#write.csv(shuswap_TP_0500123,
-#'C:/R Projects/wqo_shuswap/data/TP_shuswap.csv', row.names = FALSE)
+write.csv(clean_TP_0500123,'C:/R Projects/wqo_shuswap/data/clean_TP_0500123.csv', row.names = FALSE)
+
+## CLEANING UP SITE E208723 - MAIN ARM
 
 
 
