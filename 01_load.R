@@ -10,7 +10,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-## DOWNLOAD EMS DATA FROM DATA BC OPEN DATA OBJECT
+## DOWNLOAD AND LOAD EMS DATA FROM DATA BC OPEN DATA OBJECT
+##
 ## See rems readme file for more information: https://github.com/bcgov/rems/blob/master/README.Rmd
 
 ## install.packages("package name") if not already installed
@@ -22,8 +23,8 @@ library(rems)
 library(dplyr)
 library(ggplot2)
 library(wqbc)
-
-# LOAD WATER QUALITY DATASET
+library(lubridate)
+#
 # From BC Data Catalogue using bcgov/rems package.
 # Two year data, four year data, and historic data can be downloaded.
 # You can specify  which = "4yr"  to get the last four years of data
@@ -61,4 +62,3 @@ filtered_historic2 <- collect(filtered_historic2) %>%
 #glimpse(filtered_historic2)
 
 all_data_shuswap <- bind_ems_data(filtered_twoyear, filtered_historic2)
-

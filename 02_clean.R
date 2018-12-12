@@ -68,13 +68,16 @@ shuswap_TP_0500123 <- filter(shuswap_TP, EMS_ID == "0500123")
 shuswap_TP_0500123 <- shuswap_TP_0500123[-c(2,4,6,8,25,142,173,198), ]
 
 # Change format of the date to remove time
-shuswap_TP_0500123$COLLECTION_START <- as.Date(shuswap_TP_0500123$COLLECTION_START, tz = "PST", "%m-%d-%Y")
+shuswap_TP_0500123$COLLECTION_START <- as.Date(shuswap_TP_0500123$COLLECTION_START, format = "%Y %m %d")
 
 # Separate df into growing season (May - October) and non-growing season (November to April)
-shuswap_TP_0500123$Month <- as.numeric(substring(shuswap_TP_0500123$COLLECTION_START, first = 05, last = 10))
+shuswap_TP_0500123$Month <- as.character(format(shuswap_TP_0500123$COLLECTION_START, '%b'))
+shuswap_TP_0500123_gs <- filter(shuswap_TP_0500123, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sept"| Month == "Oct")
 
 # Average values per day
-#
+
+# Plot growing season means
+
 ##### NITROGEN #####
 
 ##### DISSOLVED OXYGEN #####
