@@ -18,12 +18,13 @@
 
 library(devtools)
 #install_github("bcgov/rems")
-#install_github("bcgov/wqbc")
+install_github("bcgov/wqbc", ref = "develop")
 library(rems)
 library(dplyr)
 library(ggplot2)
 library(wqbc)
 library(lubridate)
+library(readr)
 #
 # From BC Data Catalogue using bcgov/rems package.
 # Two year data, four year data, and historic data can be downloaded.
@@ -49,16 +50,16 @@ filtered_historic <- read_historic_data(
                                     #from_date = "2011/05/06",
                                     to_date = "2018/12/04")
 
-
 hist_db <- attach_historic_data()
 filtered_historic2 <- hist_db %>%
-  select(EMS_ID, MONITORING_LOCATION, LOCATION_TYPE, COLLECTION_START, LOCATION_PURPOSE, SAMPLE_CLASS, SAMPLE_STATE,
-         SAMPLE_DESCRIPTOR, PARAMETER_CODE, PARAMETER, ANALYTICAL_METHOD_CODE, ANALYTICAL_METHOD, RESULT_LETTER,
-         RESULT, UNIT, METHOD_DETECTION_LIMIT) %>%
+  select(EMS_ID, MONITORING_LOCATION, LOCATION_TYPE, COLLECTION_START, LOCATION_PURPOSE, SAMPLE_CLASS, SAMPLE_STATE, SAMPLE_DESCRIPTOR, PARAMETER_CODE, PARAMETER, ANALYTICAL_METHOD_CODE, ANALYTICAL_METHOD, RESULT_LETTER, RESULT, UNIT, METHOD_DETECTION_LIMIT) %>%
   filter(EMS_ID %in% c("E206771", "0500124", "E208723", "0500123"))
 
 filtered_historic2 <- collect(filtered_historic2) %>%
   mutate(COLLECTION_START = ems_posix_numeric(COLLECTION_START))
-#glimpse(filtered_historic2)
 
 all_data_shuswap <- bind_ems_data(filtered_twoyear, filtered_historic2)
+
+## CREATE CSV OF RAW DATA
+write.csv(all_data_shuswap, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
+
