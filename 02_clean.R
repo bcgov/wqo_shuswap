@@ -29,7 +29,6 @@
 # write.csv(shuswap_df, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
 
 # Just load csv each time so don't have to download from EMS. Ensures dataset remains consistent.
-library(readr)
 all_data_shuswap <- read_csv("data/all_data_shuswap.csv")
 
 ##### PHOSPHORUS #####
