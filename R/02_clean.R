@@ -26,10 +26,10 @@
 # distinct(shuswap_df, MONITORING_SITE = "0500123", PARAMETER)
 # #
 # # CREATE CSV OF ALL RAW CLEAN DATA
-# write.csv(shuswap_df, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
+# write.csv(shuswap_df, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap_clean.csv', row.names = FALSE)
 
 # Just load csv each time so don't have to download from EMS. Ensures dataset remains consistent.
-all_data_shuswap <- read_csv("data/all_data_shuswap.csv")
+all_data_shuswap <- read_csv("data/all_data_shuswap_clean.csv")
 
 ##### PHOSPHORUS #####
 # Initial Visualization
@@ -64,16 +64,19 @@ for (s in sites){
 # Include surface samples only (it's just most recent data that have deep water samples)
 
 shuswap_TP_0500123 <- filter(shuswap_TP, EMS_ID == "0500123")
-shuswap_TP_0500123 <- shuswap_TP_0500123[-c(2,4,6,8,25,142,173,198), ]
+shuswap_TP_0500123 <- shuswap_TP_0500123[-c(2,4,22,115,141,172,197), ]
 
-# Change format of the date to remove time
-shuswap_TP_0500123$COLLECTION_START <- as.Date(shuswap_TP_0500123$COLLECTION_START, format = "%Y %m %d")
+# Change format of the date to remove time and average samples taken on the same day
+shuswap_TP_0500123 <- shuswap_TP_0500123 %>%
+  mutate(COLLECTION_START = date(COLLECTION_START)) %>%
+  group_by(COLLECTION_START) %>%
+  summarize(RESULT_ugL = sum(RESULT_ugL))
 
 # Separate df into growing season (May - October) and non-growing season (November to April)
 shuswap_TP_0500123$Month <- as.character(format(shuswap_TP_0500123$COLLECTION_START, '%b'))
 shuswap_TP_0500123_gs <- filter(shuswap_TP_0500123, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sept"| Month == "Oct")
 
-# Average values per day
+
 
 # Plot growing season means
 
