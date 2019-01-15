@@ -57,8 +57,7 @@ for (s in sites){
   plot(plotpoint)
 }
 
-# CLEANING UP SITE 0500123 - SORRENTO
-
+# CLEANING UP SITE 0500123 - SORRENTO REACH
 # Remove 4 rows of 8/21/2002 and 2/11/2003 that look like they were entered wrong at 100 ug/L. According to Kevin, these are likely metals results that got lumped into the P test results. These days are entered twice, the second entry at < MDL of 2 ug/L which would be the P MDL.
 # Remove value of 20 (has a < so supposed to be <MDL)
 # Include surface samples only (it's just most recent data that have deep water samples)
@@ -72,14 +71,79 @@ shuswap_TP_0500123 <- shuswap_TP_0500123 %>%
   group_by(COLLECTION_START) %>%
   summarize(RESULT_ugL = sum(RESULT_ugL))
 
-# Separate df into growing season (May - October) and non-growing season (November to April)
+## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
+#write.csv(shuswap_TP_0500123,
+ #         'C:/R Projects/wqo_shuswap/data/shuswap_TP_0500123.csv', row.names = FALSE)
+
+# Separate df into growing season (May - October) and non-growing season (November to April) by adding Month and Year columns
 shuswap_TP_0500123$Month <- as.character(format(shuswap_TP_0500123$COLLECTION_START, '%b'))
+shuswap_TP_0500123$Year <- as.character(format(shuswap_TP_0500123$COLLECTION_START, '%Y'))
 shuswap_TP_0500123_gs <- filter(shuswap_TP_0500123, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sept"| Month == "Oct")
 
+# CLEANING UP SITE E206771 - SALMON ARM REACH
+# Removing deep lake values and rows where the result has a result letter but the result is entered as 30 and 100 ug/L whereas I think it should be 3ug/L and 10 ug/L.
 
+shuswap_TP_E206771 <- filter(shuswap_TP, EMS_ID == "E206771")
+shuswap_TP_E206771 <- shuswap_TP_E206771[-c(2,4,6,9,11,13,15,60,114,123,195), ]
 
-# Plot growing season means
+# Change format of the date to remove time and average samples taken on the same day
+shuswap_TP_E206771 <- shuswap_TP_E206771 %>%
+  mutate(COLLECTION_START = date(COLLECTION_START)) %>%
+  group_by(COLLECTION_START) %>%
+  summarize(RESULT_ugL = sum(RESULT_ugL))
 
+## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
+#write.csv(shuswap_TP_E206771,
+ #         'C:/R Projects/wqo_shuswap/data/shuswap_TP_E206771.csv', row.names = FALSE)
+
+# Separate df into growing season (May - October) and non-growing season (November to April) by adding Month and Year columns
+shuswap_TP_E206771$Month <- as.character(format(shuswap_TP_E206771$COLLECTION_START, '%b'))
+shuswap_TP_E206771$Year <- as.character(format(shuswap_TP_E206771$COLLECTION_START, '%Y'))
+shuswap_TP_E206771_gs <- filter(shuswap_TP_E206771, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sept"| Month == "Oct")
+
+# CLEANING UP SITE 0500124 - SICAMOUS REACH
+# Removed lower depth samples and a couple MDL errors
+shuswap_TP_0500124 <- filter(shuswap_TP, EMS_ID == "0500124")
+shuswap_TP_0500124 <- shuswap_TP_0500124[-c(2,4,161,224), ]
+
+# Change format of the date to remove time and average samples taken on the same day
+shuswap_TP_0500124 <- shuswap_TP_0500124 %>%
+  mutate(COLLECTION_START = date(COLLECTION_START)) %>%
+  group_by(COLLECTION_START) %>%
+  summarize(RESULT_ugL = sum(RESULT_ugL))
+
+## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
+#write.csv(shuswap_TP_0500124,
+ #        'C:/R Projects/wqo_shuswap/data/shuswap_TP_0500124.csv', row.names = FALSE)
+
+# Separate df into growing season (May - October) and non-growing season (November to April) by adding Month and Year columns
+shuswap_TP_0500124$Month <- as.character(format(shuswap_TP_0500124$COLLECTION_START, '%b'))
+shuswap_TP_0500124$Year <- as.character(format(shuswap_TP_0500124$COLLECTION_START, '%Y'))
+shuswap_TP_0500124_gs <- filter(shuswap_TP_0500124, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sept"| Month == "Oct")
+#
+# CLEANING UP SITE E208723 - MAIN ARM
+## Removed lower depth samples and a couple MDL errors
+shuswap_TP_E208723 <- filter(shuswap_TP, EMS_ID == "E208723")
+shuswap_TP_E208723 <- shuswap_TP_E208723[-c(), ]
+
+# Change format of the date to remove time and average samples taken on the same day
+shuswap_TP_E208723 <- shuswap_TP_E208723 %>%
+  mutate(COLLECTION_START = date(COLLECTION_START)) %>%
+  group_by(COLLECTION_START) %>%
+  summarize(RESULT_ugL = sum(RESULT_ugL))
+
+## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
+#write.csv(shuswap_TP_E208723,
+ #       'C:/R Projects/wqo_shuswap/data/shuswap_TP_E208723.csv', row.names = FALSE)
+
+# Separate df into growing season (May - October) and non-growing season (November to April) by adding Month and Year columns
+shuswap_TP_E208723$Month <- as.character(format(shuswap_TP_E208723$COLLECTION_START, '%b'))
+shuswap_TP_E208723$Year <- as.character(format(shuswap_TP_E208723$COLLECTION_START, '%Y'))
+shuswap_TP_E208723_gs <- filter(shuswap_TP_E208723, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sept"| Month == "Oct")
+#
+#
+#
+#
 ##### NITROGEN #####
 
 ##### DISSOLVED OXYGEN #####
@@ -91,12 +155,5 @@ shuswap_TP_0500123_gs <- filter(shuswap_TP_0500123, Month == "May"|Month == "Jun
 ##### E. coli #####
 
 
-# BOXPLOT
-plotbox <- ggplot(shuswap_TP, aes(x = MONITORING_LOCATION, y = RESULT_ugL)) +
-#facet_wrap(PARAMETER ~ EMS_ID, scales = "free_y")
-geom_boxplot()
-plot(plotbox)
 
-## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
-#write.csv(shuswap_TP_0500123,
-#'C:/R Projects/wqo_shuswap/data/TP_shuswap.csv', row.names = FALSE)
+
