@@ -25,6 +25,8 @@ library(ggplot2)
 library(wqbc)
 library(lubridate)
 library(readr)
+library(directlabels)
+
 #
 # From BC Data Catalogue using bcgov/rems package.
 # Two year data, four year data, and historic data can be downloaded.
