@@ -12,20 +12,34 @@
 
 
 # PLOT GROWING SEASON MEANS
-# Bind together all clean P datasets for the 4 sites
-plotbox <- ggplot(subset(shuswap_TP_0500123_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
+# Load fish data to plot with TP
+thompson_fish <- read_csv("data/thompson_fish_numbers.csv")
+
+sorrento_box <- ggplot(subset(shuswap_TP_0500123_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
 #facet_wrap(PARAMETER ~ EMS_ID, scales = "free_y")
-geom_boxplot()
-plot(plotbox)
+geom_boxplot() +
+   ggtitle("Sorrento Reach") +
+    xlab("Date") +
+    ylab("Growing Season TP (ug/L)")
+ plot(sorrento_box)
 
+salmon_arm_box <- ggplot(subset(shuswap_TP_E206771_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
+   geom_boxplot() +
+   ggtitle("Salmon Arm") +
+   xlab("Date") +
+   ylab("Growing Season TP (ug/L)")
+ plot(salmon_arm_box)
 
+sicamous_box <- ggplot(subset(shuswap_TP_0500124_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
+   geom_boxplot() +
+   ggtitle("Sicamous Reach") +
+   xlab("Date") +
+   ylab("Growing Season TP (ug/L)")
+ plot(sicamous_box)
 
-# would be great to make box plots for various parameters (P and N) and then a bunch of scatterplots of the other parameters if needed. Or at least load the clean datasheet and then do plot code individually.
-# May be able to join all the clean data together if its in the same form and then create a function to make them all together.
-plotpoint <- ggplot(clean_TP_0500123_gs, aes(x = Date, y = Value_ugL)) +
-  geom_point() +
-  ggtitle("Growing season means 0500123") +
-  xlab("Date") +
-  ylab("Total Phosphorus (mg/L)")
-  plot(plotpoint)
-
+ main_arm_point <- ggplot(subset(shuswap_TP_E208723_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
+   geom_point() +
+   ggtitle("Main Arm") +
+   xlab("Date") +
+   ylab("Growing Season TP (ug/L)")
+ plot(main_arm_point)
