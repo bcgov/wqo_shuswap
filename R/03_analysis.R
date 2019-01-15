@@ -21,6 +21,7 @@ geom_boxplot() +
    ggtitle("Sorrento Reach") +
     xlab("Date") +
     ylab("Growing Season TP (ug/L)")
+  #scale_x_date(labels = date_format("%Y")) +
  plot(sorrento_box)
 
 salmon_arm_box <- ggplot(subset(shuswap_TP_E206771_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
@@ -29,6 +30,15 @@ salmon_arm_box <- ggplot(subset(shuswap_TP_E206771_gs, Year>1999), aes(group = Y
    xlab("Date") +
    ylab("Growing Season TP (ug/L)")
  plot(salmon_arm_box)
+
+
+ salmon_arm_point <- ggplot(subset(shuswap_TP_E206771_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
+   geom_point() +
+   ggtitle("Salmon Arm") +
+   xlab("Date") +
+   ylab("Growing Season TP (ug/L)")
+ plot(salmon_arm_point)
+
 
 sicamous_box <- ggplot(subset(shuswap_TP_0500124_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
    geom_boxplot() +
@@ -43,3 +53,15 @@ sicamous_box <- ggplot(subset(shuswap_TP_0500124_gs, Year>1999), aes(group = Yea
    xlab("Date") +
    ylab("Growing Season TP (ug/L)")
  plot(main_arm_point)
+
+ fish <- ggplot(subset(thompson_fish, year>1999), aes(x = year, y = number_of_fish, color = location)) +
+   geom_line() +
+   #geom_dl(aes(label = location), method = "last.points") +
+   #scale_x_date(labels = date_format("%Y"), date_breaks = "1 year") +
+   xlab("Year of Fish Run") +
+   ylab("Number of Salmon")
+plot(fish)
+ggsave(filename = "fish_thompson.png", plot = fish, path = 'C:/R Projects/wqo_shuswap/outputs', width = 9, height = 5, units= "in")
+
+
+
