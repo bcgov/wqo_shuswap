@@ -15,46 +15,48 @@
 # Load fish data to plot with TP
 thompson_fish <- read_csv("data/thompson_fish_numbers.csv")
 
-sorrento_box <- ggplot(subset(shuswap_TP_0500123_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
+sorrento_box <- ggplot(subset(shuswap_TP_0500123_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL)) +
 #facet_wrap(PARAMETER ~ EMS_ID, scales = "free_y")
 geom_boxplot() +
-   ggtitle("Sorrento Reach") +
+   ggtitle("Sorrento Reach - 0500123") +
     xlab("Date") +
     ylab("Growing Season TP (ug/L)")
   #scale_x_date(labels = date_format("%Y")) +
  plot(sorrento_box)
 
-salmon_arm_box <- ggplot(subset(shuswap_TP_E206771_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
+salmon_arm_box <- ggplot(subset(shuswap_TP_E206771_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL)) +
    geom_boxplot() +
-   ggtitle("Salmon Arm") +
+  geom_hline(aes(yintercept = 15), colour = "red", linetype = "dashed") +
+   ggtitle("Salmon Arm - E206771") +
    xlab("Date") +
    ylab("Growing Season TP (ug/L)")
- plot(salmon_arm_box)
+plot(salmon_arm_box)
 
 
- salmon_arm_point <- ggplot(subset(shuswap_TP_E206771_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
+ salmon_arm_point <- ggplot(subset(shuswap_TP_E206771_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL)) +
    geom_point() +
-   ggtitle("Salmon Arm") +
+   geom_hline(aes(yintercept = 15), colour = "red", linetype = "dashed") +
+   ggtitle("Salmon Arm - E206771") +
    xlab("Date") +
    ylab("Growing Season TP (ug/L)")
  plot(salmon_arm_point)
 
 
-sicamous_box <- ggplot(subset(shuswap_TP_0500124_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
+sicamous_box <- ggplot(subset(shuswap_TP_0500124_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL)) +
    geom_boxplot() +
-   ggtitle("Sicamous Reach") +
+   ggtitle("Sicamous Reach - 0500124") +
    xlab("Date") +
    ylab("Growing Season TP (ug/L)")
  plot(sicamous_box)
 
- main_arm_point <- ggplot(subset(shuswap_TP_E208723_gs, Year>1999), aes(group = Year, x = COLLECTION_START, y = RESULT_ugL)) +
+ main_arm_point <- ggplot(subset(shuswap_TP_E208723_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL)) +
    geom_point() +
-   ggtitle("Main Arm") +
+   ggtitle("Main Arm - E208723") +
    xlab("Date") +
    ylab("Growing Season TP (ug/L)")
  plot(main_arm_point)
 
- fish <- ggplot(subset(thompson_fish, year>1999), aes(x = year, y = number_of_fish, color = location)) +
+ fish <- ggplot(subset(thompson_fish, year>1994), aes(x = year, y = number_of_fish, color = location)) +
    geom_line() +
    #geom_dl(aes(label = location), method = "last.points") +
    #scale_x_date(labels = date_format("%Y"), date_breaks = "1 year") +
