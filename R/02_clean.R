@@ -124,7 +124,7 @@ shuswap_TP_0500124_gs <- filter(shuswap_TP_0500124, Month == "May"|Month == "Jun
 # CLEANING UP SITE E208723 - MAIN ARM
 ## Removed lower depth samples and a couple MDL errors
 shuswap_TP_E208723 <- filter(shuswap_TP, EMS_ID == "E208723")
-shuswap_TP_E208723 <- shuswap_TP_E208723[-c(), ]
+shuswap_TP_E208723 <- shuswap_TP_E208723[-c(50,52,55,64,73), ]
 
 # Change format of the date to remove time and average samples taken on the same day
 shuswap_TP_E208723 <- shuswap_TP_E208723 %>%
