@@ -18,6 +18,7 @@ thompson_fish <- read_csv("data/thompson_fish_numbers.csv")
 sorrento_box <- ggplot(subset(shuswap_TP_0500123_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL)) +
 #facet_wrap(PARAMETER ~ EMS_ID, scales = "free_y")
 geom_boxplot() +
+  geom_hline(aes(yintercept = 10), colour = "red", linetype = "dashed") +
    ggtitle("Sorrento Reach - 0500123") +
     xlab("Date") +
     ylab("Growing Season TP (ug/L)")
@@ -44,6 +45,7 @@ plot(salmon_arm_box)
 
 sicamous_box <- ggplot(subset(shuswap_TP_0500124_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL)) +
    geom_boxplot() +
+  geom_hline(aes(yintercept = 10), colour = "red", linetype = "dashed") +
    ggtitle("Sicamous Reach - 0500124") +
    xlab("Date") +
    ylab("Growing Season TP (ug/L)")
@@ -51,6 +53,7 @@ sicamous_box <- ggplot(subset(shuswap_TP_0500124_gs, Year>1999), aes(group = Yea
 
  main_arm_point <- ggplot(subset(shuswap_TP_E208723_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL)) +
    geom_point() +
+   geom_hline(aes(yintercept = 10), colour = "red", linetype = "dashed") +
    ggtitle("Main Arm - E208723") +
    xlab("Date") +
    ylab("Growing Season TP (ug/L)")
