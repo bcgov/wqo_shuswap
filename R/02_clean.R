@@ -65,10 +65,20 @@ for (s in sites){
 shuswap_TP_0500123 <- filter(shuswap_TP, EMS_ID == "0500123")
 shuswap_TP_0500123 <- shuswap_TP_0500123[-c(2,4,22,115,141,172,197), ]
 
+# Plot total P to figure out spring overturn P concentration
+sorrento_line <- ggplot(subset(shuswap_TP_0500123, Year>2009), aes(x = COLLECTION_START, y = RESULT_ugL)) +
+  geom_line() +
+  #geom_hline(aes(yintercept = 15), colour = "red", linetype = "dashed") +
+  ggtitle("Sorrento Reach-0500123 TP (ug/L)") +
+  xlab("Date") +
+  ylab("Total Phosphorus (ug/L)")
+plot(sorrento_line)
+
 # Change format of the date to remove time and average samples taken on the same day
 shuswap_TP_0500123 <- shuswap_TP_0500123 %>%
-  mutate(COLLECTION_START = date(COLLECTION_START)) %>%
-  group_by(COLLECTION_START) %>%
+  mutate(COLLECTION_START = date(COLLECTION_START))
+
+shuswap_TP_0500123_avg <- group_by(COLLECTION_START) %>%
   summarize(RESULT_ugL = sum(RESULT_ugL))
 
 ## CREATE CSV OF CLEAN DATA (DO THIS FOR RAW DF, AND ALL CLEANED UP PARAMETER DFs)
