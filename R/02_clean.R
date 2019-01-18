@@ -75,6 +75,10 @@ TP_0500123_avg <- TP_0500123 %>%
   group_by(COLLECTION_START) %>%
   summarize(RESULT_ugL_avg = mean(RESULT_ugL))
 
+# Add back EMS_ID and MONITORING_LOCATION columns to avg df
+TP_0500123_avg$EMS_ID <- "0500123"
+TP_0500123_avg$MONITORING_LOCATION <- "SHUSWAP LK WEST OF SORRENTO-SORRENTO REACH"
+
 # Separate df into growing season (May - October) by adding Month and Year columns
 TP_0500123_avg$Month <- as.character(format(TP_0500123_avg$COLLECTION_START, '%b'))
 TP_0500123_avg$Year <- as.character(format(TP_0500123_avg$COLLECTION_START, '%Y'))
@@ -90,6 +94,10 @@ TP_E206771_avg <- TP_E206771 %>%
   mutate(COLLECTION_START = date(COLLECTION_START)) %>%
   group_by(COLLECTION_START) %>%
   summarize(RESULT_ugL_avg = mean(RESULT_ugL))
+
+# Add back EMS_ID and MONITORING_LOCATION columns to avg df
+TP_E206771_avg$EMS_ID <- "E206771"
+TP_E206771_avg$MONITORING_LOCATION <- "SHUSWAP LK TB # 5-SALMON ARM REACH"
 
 # Separate df into growing season (May - October) by adding Month and Year columns
 TP_E206771_avg$Month <- as.character(format(TP_E206771_avg$COLLECTION_START, '%b'))
@@ -107,6 +115,10 @@ TP_0500124_avg <- TP_0500124 %>%
   group_by(COLLECTION_START) %>%
   summarize(RESULT_ugL_avg = mean(RESULT_ugL))
 
+# Add back EMS_ID and MONITORING_LOCATION columns to avg df
+TP_0500124_avg$EMS_ID <- "0500124"
+TP_0500124_avg$MONITORING_LOCATION <- "SHUSWAP LK OPPOSITE MARBLE PT.-SICAMOUS REACH"
+
 # Separate df into growing season (May - October) and non-growing season (November to April) by adding Month and Year columns
 TP_0500124_avg$Month <- as.character(format(TP_0500124_avg$COLLECTION_START, '%b'))
 TP_0500124_avg$Year <- as.character(format(TP_0500124_avg$COLLECTION_START, '%Y'))
@@ -123,17 +135,22 @@ TP_E208723_avg <- TP_E208723 %>%
   group_by(COLLECTION_START) %>%
   summarize(RESULT_ugL_avg = mean(RESULT_ugL))
 
+# Add back EMS_ID and MONITORING_LOCATION columns to avg df
+TP_E208723_avg$EMS_ID <- "E208723"
+TP_E208723_avg$MONITORING_LOCATION <- "SHUSWAP LK OFF ARMSTRONG PT-MAIN ARM REACH"
+
 # Separate df into growing season (May - October) and non-growing season (November to April) by adding Month and Year columns
 TP_E208723_avg$Month <- as.character(format(TP_E208723_avg$COLLECTION_START, '%b'))
 TP_E208723_avg$Year <- as.character(format(TP_E208723_avg$COLLECTION_START, '%Y'))
 TP_E208723_gs <- filter(TP_E208723_avg, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sept"| Month == "Oct")
 
 # Join clean TP data from all 4 sites together
-TP_clean <- bind_rows(TP_0500123, TP_0500124, TP_E206771, TP_E208723)
+TP_clean <- bind_rows(TP_0500123_avg, TP_0500124_avg, TP_E206771_avg, TP_E208723_avg)
 
 # CREATE CSV OF CLEAN TP DATA
-write.csv(shuswap_TP_E208723,
-       'C:/R Projects/wqo_shuswap/data/TP_clean.csv', row.names = FALSE)#
+write.csv(TP_clean,
+       'C:/R Projects/wqo_shuswap/data/TP_clean.csv', row.names = FALSE)
+#
 #
 #
 #
