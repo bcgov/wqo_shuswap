@@ -11,18 +11,22 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 ###################################### PHOSPHORUS #####################################
+
 # TP SUMMARY TABLE
 TP_sum_table <- TP_clean %>%
   group_by(EMS_ID, MONITORING_LOCATION) %>%
   summarise(Min=min(RESULT_ugL_avg), Max=max(RESULT_ugL_avg), Median=median(RESULT_ugL_avg), n=length(RESULT_ugL_avg))
 
+# TP line plot for each site
 sites <- c("E206771", "0500124", "E208723", "0500123")
 
 for (s in sites){
   TP_year <- filter(TP_clean, EMS_ID == s)
   plotTPyear <- ggplot(subset(TP_year, Year>2009), aes(x = Month, y = RESULT_ugL_avg, color = Year, group = Year)) +
     geom_line() +
+    geom_point() +
     ggtitle(s) +
+    scale_x_discrete(limits = month.abb) +
     xlab("Month") +
     ylab("Total Phosphorus (ug/L)")
   plot(plotTPyear)
@@ -40,6 +44,8 @@ plot(fish)
 ggsave(filename = "fish_thompson.png", plot = fish, path = 'C:/R Projects/wqo_shuswap/outputs', width = 9, height = 5, units= "in")
 
 # PLOT GROWING SEASON MEANS
+#
+# Sorrento Box Plot
 sorrento_box <- ggplot(subset(TP_0500123_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL_avg)) +
 #facet_wrap(PARAMETER ~ EMS_ID, scales = "free_y")
 geom_boxplot() +
@@ -50,6 +56,7 @@ geom_boxplot() +
   #scale_x_date(labels = date_format("%Y")) +
  plot(sorrento_box)
 
+# Salmon Arm Box Plot
 salmon_arm_box <- ggplot(subset(TP_E206771_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL_avg)) +
    geom_boxplot() +
   geom_hline(aes(yintercept = 15), colour = "red", linetype = "dashed") +
@@ -58,6 +65,7 @@ salmon_arm_box <- ggplot(subset(TP_E206771_gs, Year>1999), aes(group = Year, x =
    ylab("Growing Season TP (ug/L)")
 plot(salmon_arm_box)
 
+# Salmon Arm Point Plot
 salmon_arm_point <- ggplot(subset(TP_E206771_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL_avg)) +
    geom_point() +
    geom_hline(aes(yintercept = 15), colour = "red", linetype = "dashed") +
@@ -66,6 +74,7 @@ salmon_arm_point <- ggplot(subset(TP_E206771_gs, Year>1999), aes(group = Year, x
    ylab("Growing Season TP (ug/L)")
  plot(salmon_arm_point)
 
+# Sicamous Box Plot
 sicamous_box <- ggplot(subset(TP_0500124_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL_avg)) +
    geom_boxplot() +
   geom_hline(aes(yintercept = 10), colour = "red", linetype = "dashed") +
@@ -74,6 +83,7 @@ sicamous_box <- ggplot(subset(TP_0500124_gs, Year>1999), aes(group = Year, x = Y
    ylab("Growing Season TP (ug/L)")
  plot(sicamous_box)
 
+# Main Arm Point Plot
 main_arm_point <- ggplot(subset(TP_E208723_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL_avg)) +
    geom_point() +
    geom_hline(aes(yintercept = 10), colour = "red", linetype = "dashed") +
