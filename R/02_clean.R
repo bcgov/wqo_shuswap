@@ -14,6 +14,7 @@
 #
 # View and filter out non water samples
 # Don't want to use clean_wqdata function as this is for lake data with varying depths per day, and the clean function averages multiple daily measurments.
+# Haven't used tidy_ems_data as I have left the data at the MDL (if there's a '<", the RESULT is the MDL anyway), and I don't want to change the column names as I don't need to run the clean function.
 # distinct(all_data_shuswap, SAMPLE_STATE)
 # shuswap_clean <- filter(all_data_shuswap, SAMPLE_STATE == "Fresh Water")
 #
@@ -145,24 +146,24 @@ TP_E208723_avg$Year <- as.character(format(TP_E208723_avg$COLLECTION_START, '%Y'
 TP_E208723_gs <- filter(TP_E208723_avg, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sept"| Month == "Oct")
 
 # Join clean TP data from all 4 sites together
+# *****Could these cleaning steps for done for all the sites at once, instead of each site? I think a few loops could be written here - at least for the adding the month and year columns and separating into growing season.
 TP_clean <- bind_rows(TP_0500123_avg, TP_0500124_avg, TP_E206771_avg, TP_E208723_avg)
 
 # CREATE CSV OF CLEAN TP DATA
-write.csv(TP_clean,
-       'C:/R Projects/wqo_shuswap/data/TP_clean.csv', row.names = FALSE)
+#write.csv(TP_clean,'C:/R Projects/wqo_shuswap/data/TP_clean.csv', row.names = FALSE)
 #
 #
 #
 #
 ################################### NITROGEN #########################################
 
-##### DISSOLVED OXYGEN #####
+################################## DISSOLVED OXYGEN ##################################
 
-##### CHLOROPHYLL A
+################################# CHLOROPHYLL A ######################################
 
-##### SECCHI DEPTH ######
+################################# SECCHI DEPTH #######################################
 
-##### E. coli #####
+################################# E. coli ############################################
 
 
 
