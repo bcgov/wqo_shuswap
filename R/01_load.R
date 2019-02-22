@@ -64,4 +64,3 @@ library(directlabels)
 #
 # ## CREATE CSV OF RAW DATA
 # write.csv(all_data_shuswap, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
-#
