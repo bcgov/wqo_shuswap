@@ -10,19 +10,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-###################################### PHOSPHORUS #####################################
+###################################### PHOSPHORUS ####################################
 
-# TP SUMMARY TABLE
+# TP SUMMARY TABLE of clean, daily averaged data for the entire year (not monthly means)
 TP_sum_table <- TP_clean %>%
   group_by(EMS_ID, MONITORING_LOCATION) %>%
   summarise(Min=min(RESULT_ugL_avg), Max=max(RESULT_ugL_avg), Median=median(RESULT_ugL_avg), n=length(RESULT_ugL_avg))
 
-# TP line plot for each site
+# TP line plot for each site for all year data (not just growing season). Can change to just look at growing season means per month over a year by changing the dataframe - would have to bind together each site's growing season dataframe.
 sites <- c("E206771", "0500124", "E208723", "0500123")
 
 for (s in sites){
-  TP_year <- filter(TP_clean, EMS_ID == s)
-  plotTPyear <- ggplot(subset(TP_year, Year>2009), aes(x = Month, y = RESULT_ugL_avg, color = Year, group = Year)) +
+  TP_year <- filter(TP_mm_gs, EMS_ID == s)
+  plotTPyear <- ggplot(subset(TP_year, Year>2009), aes(x = Month, y = RESULT_month_mean, color = Year, group = Year)) +
     geom_line() +
     geom_point() +
     ggtitle(s) +
