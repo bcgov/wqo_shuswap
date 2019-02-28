@@ -32,35 +32,35 @@ library(directlabels)
 # Two year data, four year data, and historic data can be downloaded.
 # You can specify  which = "4yr"  to get the last four years of data
 
-# twoyear <- get_ems_data(which = "2yr", ask = TRUE)
+twoyear <- get_ems_data(which = "2yr", ask = TRUE)
+
+filtered_twoyear <- filter_ems_data(twoyear,
+                                    emsid = c("E206771", "0500124", "E208723", "0500123"),
+                                    #parameter = ("Barium Total"),
+                                    #from_date = "2011/05/06",
+                                    to_date = "2019/02/28")
+
+#remove_data_cache("2yr")
+
+# DOWNLOAD HISTORIC DATA - JUST HAVE TO RUN THIS CODE ONCE
+#download_historic_data(ask = FALSE)
 #
-# filtered_twoyear <- filter_ems_data(twoyear,
+# Run this part if historic code below isn't working
+# filtered_historic <- read_historic_data(
 #                                     emsid = c("E206771", "0500124", "E208723", "0500123"),
 #                                     #parameter = ("Barium Total"),
 #                                     #from_date = "2011/05/06",
 #                                     to_date = "2018/12/04")
-#
-# #remove_data_cache("2yr")
-#
-# # DOWNLOAD HISTORIC DATA - JUST HAVE TO RUN THIS CODE ONCE
-# #download_historic_data(ask = FALSE)
-# #
-# # Run this part if historic code below isn't working
-# # filtered_historic <- read_historic_data(
-# #                                     emsid = c("E206771", "0500124", "E208723", "0500123"),
-# #                                     #parameter = ("Barium Total"),
-# #                                     #from_date = "2011/05/06",
-# #                                     to_date = "2018/12/04")
-#
-# hist_db <- attach_historic_data()
-# filtered_historic2 <- hist_db %>%
-#   select(EMS_ID, MONITORING_LOCATION, LOCATION_TYPE, COLLECTION_START, LOCATION_PURPOSE, SAMPLE_CLASS, SAMPLE_STATE, SAMPLE_DESCRIPTOR, PARAMETER_CODE, PARAMETER, ANALYTICAL_METHOD_CODE, ANALYTICAL_METHOD, RESULT_LETTER, RESULT, UNIT, METHOD_DETECTION_LIMIT) %>%
-#   filter(EMS_ID %in% c("E206771", "0500124", "E208723", "0500123"))
-#
-# filtered_historic2 <- collect(filtered_historic2) %>%
-#   mutate(COLLECTION_START = ems_posix_numeric(COLLECTION_START))
-#
-# all_data_shuswap <- bind_ems_data(filtered_twoyear, filtered_historic2)
-#
-# ## CREATE CSV OF RAW DATA
-# write.csv(all_data_shuswap, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
+
+hist_db <- attach_historic_data()
+filtered_historic2 <- hist_db %>%
+  select(EMS_ID, MONITORING_LOCATION, LOCATION_TYPE, COLLECTION_START, LOCATION_PURPOSE, SAMPLE_CLASS, SAMPLE_STATE, SAMPLE_DESCRIPTOR, PARAMETER_CODE, PARAMETER, ANALYTICAL_METHOD_CODE, ANALYTICAL_METHOD, RESULT_LETTER, RESULT, UNIT, METHOD_DETECTION_LIMIT) %>%
+  filter(EMS_ID %in% c("E206771", "0500124", "E208723", "0500123"))
+
+filtered_historic2 <- collect(filtered_historic2) %>%
+  mutate(COLLECTION_START = ems_posix_numeric(COLLECTION_START))
+
+all_data_shuswap <- bind_ems_data(filtered_twoyear, filtered_historic2)
+
+## CREATE CSV OF RAW DATA
+write.csv(all_data_shuswap, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
