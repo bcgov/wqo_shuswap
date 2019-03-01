@@ -46,18 +46,18 @@ ggsave(filename = "fish_thompson.png", plot = fish, path = 'C:/R Projects/wqo_sh
 # PLOT GROWING SEASON MEANS
 #
 # Sorrento Box Plot
-sorrento_box <- ggplot(subset(TP_0500123_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL_avg)) +
+sorrento_point <- ggplot(subset(TP_0500123_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_month_mean)) +
 #facet_wrap(PARAMETER ~ EMS_ID, scales = "free_y")
-geom_boxplot() +
+geom_point() +
   geom_hline(aes(yintercept = 10), colour = "red", linetype = "dashed") +
    ggtitle("Sorrento Reach - 0500123") +
     xlab("Date") +
     ylab("Growing Season TP (ug/L)")
   #scale_x_date(labels = date_format("%Y")) +
- plot(sorrento_box)
+ plot(sorrento_point)
 
 # Salmon Arm Box Plot
-salmon_arm_box <- ggplot(subset(TP_E206771_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL_avg)) +
+salmon_arm_box <- ggplot(subset(TP_E206771_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_month_mean)) +
    geom_boxplot() +
   geom_hline(aes(yintercept = 15), colour = "red", linetype = "dashed") +
    ggtitle("Salmon Arm - E206771") +
@@ -66,7 +66,7 @@ salmon_arm_box <- ggplot(subset(TP_E206771_gs, Year>1999), aes(group = Year, x =
 plot(salmon_arm_box)
 
 # Salmon Arm Point Plot
-salmon_arm_point <- ggplot(subset(TP_E206771_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL_avg)) +
+salmon_arm_point <- ggplot(subset(TP_E206771_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_month_mean)) +
    geom_point() +
    geom_hline(aes(yintercept = 15), colour = "red", linetype = "dashed") +
    ggtitle("Salmon Arm - E206771") +
@@ -75,7 +75,7 @@ salmon_arm_point <- ggplot(subset(TP_E206771_gs, Year>1999), aes(group = Year, x
  plot(salmon_arm_point)
 
 # Sicamous Box Plot
-sicamous_box <- ggplot(subset(TP_0500124_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL_avg)) +
+sicamous_box <- ggplot(subset(TP_0500124_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_month_mean)) +
    geom_boxplot() +
   geom_hline(aes(yintercept = 10), colour = "red", linetype = "dashed") +
    ggtitle("Sicamous Reach - 0500124") +
@@ -84,7 +84,7 @@ sicamous_box <- ggplot(subset(TP_0500124_gs, Year>1999), aes(group = Year, x = Y
  plot(sicamous_box)
 
 # Main Arm Point Plot
-main_arm_point <- ggplot(subset(TP_E208723_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_ugL_avg)) +
+main_arm_point <- ggplot(subset(TP_E208723_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_month_mean)) +
    geom_point() +
    geom_hline(aes(yintercept = 10), colour = "red", linetype = "dashed") +
    ggtitle("Main Arm - E208723") +
