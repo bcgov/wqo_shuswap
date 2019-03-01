@@ -29,7 +29,7 @@ shuswap_df <- select(shuswap_clean, EMS_ID, MONITORING_LOCATION, COLLECTION_STAR
 distinct(shuswap_df, MONITORING_SITE = "0500123", PARAMETER)
 #
 # # CREATE CSV OF ALL RAW CLEAN DATA
-# write.csv(shuswap_df, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap_clean.csv', row.names = FALSE)
+write.csv(shuswap_df, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap_clean.csv', row.names = FALSE)
 
 # Just load csv each time so don't have to download from EMS. Ensures dataset remains consistent.
 all_data_shuswap <- read_csv("data/all_data_shuswap_clean.csv")
@@ -218,7 +218,7 @@ TP_mm_gs <- bind_rows(TP_0500123_gs, TP_0500124_gs, TP_E206771_gs, TP_E208723_gs
 #
 #
 #
-################################### NITROGEN #########################################
+################################### TOTAL NITROGEN #########################################
 
 ################################## DISSOLVED OXYGEN ##################################
 
@@ -227,6 +227,7 @@ TP_mm_gs <- bind_rows(TP_0500123_gs, TP_0500124_gs, TP_E206771_gs, TP_E208723_gs
 ################################# SECCHI DEPTH #######################################
 
 ################################# E. coli ############################################
+################################# TOTAL ORGANIC CARBON  ##################################
 
 
 
