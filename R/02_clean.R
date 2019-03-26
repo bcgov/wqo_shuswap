@@ -12,52 +12,52 @@
 #
 # This script loads the clean raw data, allows for initital visualization of the data for each parameter for each monitoring site and then set-up of various dataframe structures to allow for plots in 03_analysis to call the dataframes.
 #
-# View and filter out non water samples
+## View and filter out non water samples
+#
 # Don't want to use clean_wqdata function as this is for lake data with varying depths per day, and the clean function averages multiple daily measurments.
 # Haven't used tidy_ems_data as I have left the data at the MDL (if there's a '<", the RESULT is the MDL anyway), and I don't want to change the column names as I don't need to run the clean function.
-distinct(all_data_shuswap, SAMPLE_STATE)
-shuswap_clean <- filter(all_data_shuswap, SAMPLE_STATE == "Fresh Water")
-
-# View and remove blanks
-distinct(all_data_shuswap, SAMPLE_CLASS)
-shuswap_clean <- filter(shuswap_clean, SAMPLE_CLASS != "Blank - field")
-
-# Refine dataframe (df) to include a subset of columns for simplified viewing analysis
-shuswap_df <- select(shuswap_clean, EMS_ID, MONITORING_LOCATION, COLLECTION_START, PARAMETER, RESULT_LETTER, RESULT, UNIT, SAMPLE_CLASS, UPPER_DEPTH, LOWER_DEPTH)
+#
+#distinct(all_data_shuswap, SAMPLE_STATE)
+#shuswap_clean <- filter(all_data_shuswap, SAMPLE_STATE == "Fresh Water")
+#
+## View and remove blanks
+#distinct(all_data_shuswap, SAMPLE_CLASS)
+#shuswap_clean <- filter(shuswap_clean, SAMPLE_CLASS != "Blank - field")
+#
+## Refine dataframe (df) to include a subset of columns for simplified viewing analysis
+#shuswap_df <- select(shuswap_clean, EMS_ID, MONITORING_LOCATION, COLLECTION_START, PARAMETER, RESULT_LETTER, RESULT, UNIT, SAMPLE_CLASS, UPPER_DEPTH, LOWER_DEPTH)
 
 # You can create a summary list of any column
-distinct(shuswap_df, MONITORING_SITE = "0500123", PARAMETER)
+#distinct(shuswap_df, MONITORING_SITE = "0500123", PARAMETER)
 #
 # # CREATE CSV OF ALL RAW CLEAN DATA
-write.csv(shuswap_df, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap_clean.csv', row.names = FALSE)
+#write.csv(shuswap_df, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap_clean.csv', row.names = FALSE)
 
 # Just load csv each time so don't have to download from EMS. Ensures dataset remains consistent.
 all_data_shuswap <- read_csv("data/all_data_shuswap_clean.csv")
 
-# Add Month, Day, Year and Time columns
+# Add Month, Day, Year and Time columns and remove time from COLLECTION_START
 all_data_shuswap$Month <- as.character(format(all_data_shuswap$COLLECTION_START, '%b'))
 all_data_shuswap$Day <- as.character(format(all_data_shuswap$COLLECTION_START, '%d'))
 all_data_shuswap$Year <- as.character(format(all_data_shuswap$COLLECTION_START, '%Y'))
 all_data_shuswap$Time <- as.character(format(all_data_shuswap$COLLECTION_START, '%H:%M:%S'))
+all_data_shuswap <- mutate(all_data_shuswap, COLLECTION_START = date(COLLECTION_START))
 
 
-############################## PHOSPHORUS #############################################
-
+############################## PHOSPHORUS ###########################################
+#
 # Initial Visualization
 TP <- filter(all_data_shuswap, PARAMETER == "Phosphorus Total")
 
 # Change units from mg/L to ug/L
 TP <- transform(TP, RESULT = RESULT*1000)
-colnames(TP)[6] <- "RESULT_ugL"
-
-# Get rid of UNIT column which says 'mg/L'
-TP <- select(TP, -UNIT)
+TP$UNIT <- "ug/L"
 
 sites <- c("E206771", "0500124", "E208723", "0500123")
 
 for (s in sites){
   TP_plots <- filter(TP, EMS_ID == s)
-  plotpoint <- ggplot(TP_plots, aes(x = COLLECTION_START, y = RESULT_ugL)) +
+  plotpoint <- ggplot(TP_plots, aes(x = COLLECTION_START, y = RESULT)) +
   geom_point() +
   ggtitle(s) +
   xlab("Date") +
@@ -78,7 +78,7 @@ TP_0500123 <- TP_0500123[-c(2,4,22,115,141,172,197), ]
 TP_0500123_avg <- TP_0500123 %>%
   mutate(COLLECTION_START = date(COLLECTION_START)) %>%
   group_by(COLLECTION_START) %>%
-  summarize(RESULT_ugL_avg = mean(RESULT_ugL))
+  summarize(RESULT_ugL_avg = mean(RESULT))
 
 # Add back EMS_ID and MONITORING_LOCATION columns to avg df
 TP_0500123_avg$EMS_ID <- "0500123"
@@ -113,7 +113,7 @@ TP_E206771 <- TP_E206771[-c(2,4,6,9,11,13,15,60,114,123,195), ]
 TP_E206771_avg <- TP_E206771 %>%
   mutate(COLLECTION_START = date(COLLECTION_START)) %>%
   group_by(COLLECTION_START) %>%
-  summarize(RESULT_ugL_avg = mean(RESULT_ugL))
+  summarize(RESULT_ugL_avg = mean(RESULT))
 
 # Add back EMS_ID and MONITORING_LOCATION columns to avg df
 TP_E206771_avg$EMS_ID <- "E206771"
@@ -148,7 +148,7 @@ TP_0500124 <- TP_0500124[-c(2,4,161,224), ]
 TP_0500124_avg <- TP_0500124 %>%
   mutate(COLLECTION_START = date(COLLECTION_START)) %>%
   group_by(COLLECTION_START) %>%
-  summarise(RESULT_ugL_avg = mean(RESULT_ugL))
+  summarise(RESULT_ugL_avg = mean(RESULT))
 
 # Add back EMS_ID and MONITORING_LOCATION columns to avg df
 TP_0500124_avg$EMS_ID <- "0500124"
@@ -183,7 +183,7 @@ TP_E208723 <- TP_E208723[-c(50,52,55,64,73), ]
 TP_E208723_avg <- TP_E208723 %>%
   mutate(COLLECTION_START = date(COLLECTION_START)) %>%
   group_by(COLLECTION_START) %>%
-  summarize(RESULT_ugL_avg = mean(RESULT_ugL))
+  summarize(RESULT_ugL_avg = mean(RESULT))
 
 # Add back EMS_ID and MONITORING_LOCATION columns to avg df
 TP_E208723_avg$EMS_ID <- "E208723"
@@ -218,17 +218,124 @@ TP_mm_gs <- bind_rows(TP_0500123_gs, TP_0500124_gs, TP_E206771_gs, TP_E208723_gs
 #
 #
 #
-################################### TOTAL NITROGEN #########################################
+################################### TOTAL NITROGEN ###################################
+# Create a dataframe with just dissolved oxygen (DO) data for the 4 sites
+#
+TN <- filter(all_data_shuswap, PARAMETER == "Nitrogen Total")
+#
+# Initial Visualization (sites object is listed above the Phosphorus code)
+#
+for (s in sites){
+  TN_plots <- filter(TN, EMS_ID == s)
+  plot_TN_point <- ggplot(subset(TN_plots, Year>2000), aes(x = COLLECTION_START, y = RESULT)) +
+    geom_point() +
+    ggtitle(s) +
+    xlab("Date") +
+    ylab("Total Nitrogen (mg/L)")
+  plot(plot_TN_point)
+}
 
 ################################## DISSOLVED OXYGEN ##################################
+# Create a dataframe with just dissolved oxygen (DO) data for the 4 sites
+#
+DO <- filter(all_data_shuswap, PARAMETER == "Oxygen Dissolved"| PARAMETER == "Dissolved Oxygen-Field")
+DO$PARAMETER <- "Dissolved Oxygen"
+
+# Initial Visualization (sites object is listed above the Phosphorus code)
+#
+for (s in sites){
+  DO_plots <- filter(DO, EMS_ID == s)
+  plot_DO_point <- ggplot(subset(DO_plots, Year>2000), aes(x = COLLECTION_START, y = RESULT)) +
+    geom_point() +
+    ggtitle(s) +
+    xlab("Date") +
+    ylab("Surface Dissolved Oxygen (mg/L)")
+  plot(plot_DO_point)
+}
 
 ################################# CHLOROPHYLL A ######################################
+# Create a dataframe with just chlorophyll A data for the 4 sites
+#
+ ChlA <- filter(all_data_shuswap, PARAMETER == "Chlorophyll A")
 
-################################# SECCHI DEPTH #######################################
+# Change units to ug/L
+#
+ChlA <- transform(ChlA, RESULT = RESULT*1000)
+ChlA$UNIT <- "ug/L"
 
-################################# E. coli ############################################
-################################# TOTAL ORGANIC CARBON  ##################################
+# Initial Visualization (sites object is listed above the Phosphorus code)
+#
+for (s in sites){
+  ChlA_plots <- filter(ChlA, EMS_ID == s)
+  plot_ChlA_point <- ggplot(subset(ChlA_plots, Year>2000), aes(x = COLLECTION_START, y = RESULT)) +
+    geom_point() +
+    ggtitle(s) +
+    xlab("Date") +
+    ylab("Chloropyll A (ug/L)")
+  plot(plot_ChlA_point)
+}
 
+################################# SECCHI DEPTH ######################################
 
+secchi <- filter(all_data_shuswap, PARAMETER == "Extinction Depth")
 
+# Initial Visualization (sites object is listed above the Phosphorus code)
+#
+for (s in sites){
+  secchi_plots <- filter(secchi, EMS_ID == s)
+  plot_secchi_col <- ggplot(subset(secchi_plots, Year>2000), aes(x = COLLECTION_START, y = RESULT)) +
+    geom_col() +
+    scale_y_reverse() +
+    ggtitle(s) +
+    xlab("Date") +
+    ylab("Secchi Depth (m)")
+  plot(plot_secchi_col)
+}
 
+################################# E. coli ###########################################
+
+ecoli <- filter(all_data_shuswap, PARAMETER == "Coliform - Fecal")
+
+# Initial Visualization (sites object is listed above the Phosphorus code)
+
+for (s in sites){
+  ecoli_plots <- filter(ecoli, EMS_ID == s)
+  plot_ecoli_point <- ggplot(subset(ecoli_plots), aes(x = COLLECTION_START, y = RESULT)) +
+    geom_point() +
+    ggtitle(s) +
+    xlab("Date") +
+    ylab("Fecal Coliforms (MPN)")
+  plot(plot_ecoli_point)
+}
+
+################################# TOTAL ORGANIC CARBON  #############################
+
+toc <- filter(all_data_shuswap, PARAMETER == "Carbon Total Organic")
+
+# Initial Visualization (sites object is listed above the Phosphorus code)
+
+for (s in sites){
+  toc_plots <- filter(toc, EMS_ID == s)
+  plot_toc_point <- ggplot(subset(toc_plots, Year>2000), aes(x = COLLECTION_START, y = RESULT)) +
+    geom_point() +
+    ggtitle(s) +
+    xlab("Date") +
+    ylab("Total Organic Carbon (mg/L)")
+  plot(plot_toc_point)
+}
+
+############################# DISSOLVED ORGANIC CARBON ##############################
+
+doc <- filter(all_data_shuswap, PARAMETER == "Carbon Dissolved Organic")
+
+# Initial Visualization (sites object is listed above the Phosphorus code)
+
+for (s in sites){
+  doc_plots <- filter(doc, EMS_ID == s)
+  plot_doc_point <- ggplot(subset(doc_plots, Year>2000), aes(x = COLLECTION_START, y = RESULT)) +
+    geom_point() +
+    ggtitle(s) +
+    xlab("Date") +
+    ylab("Dissolved Organic Carbon (mg/L)")
+  plot(plot_doc_point)
+}
