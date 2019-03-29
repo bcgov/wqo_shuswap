@@ -10,12 +10,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 #
-# This script loads the clean raw data, allows for initital visualization of the data for each parameter for each monitoring site and then set-up of various dataframe structures to allow for plots in 03_analysis to call the dataframes.
+#
+#
+#
+#
+#
+#
+## LOADS CLEAN RAW DATA, PRODUCES GRAPHS FOR INITIAL DATA VISUALIZATION FOR EACH WATER QUALITY PARAMETER FOR EACH OF THE FOUR MONITORING SITES. THREE DATAFRAMES OF DAILY MEANS, MONTHLY MEANS AND MONTHLY MEANS DURING THE GROWING SEASON (MAY - OCT) ARE PUT TOGETHER IN THE SCRIPT.
 #
 ## View and filter out non water samples
 #
-# Don't want to use clean_wqdata function as this is for lake data with varying depths per day, and the clean function averages multiple daily measurments.
-# Haven't used tidy_ems_data as I have left the data at the MDL (if there's a '<", the RESULT is the MDL anyway), and I don't want to change the column names as I don't need to run the clean function.
+## Don't want to use clean_wqdata function as this is for lake data with varying depths per day, and the clean function averages multiple daily measurments.
+#
+## Haven't used tidy_ems_data as I have left the data at the MDL (if there's a '<", the RESULT is the MDL anyway), and I don't want to change the column names as I don't need to run the clean function.
 #
 #distinct(all_data_shuswap, SAMPLE_STATE)
 #shuswap_clean <- filter(all_data_shuswap, SAMPLE_STATE == "Fresh Water")
@@ -27,7 +34,7 @@
 ## Refine dataframe (df) to include a subset of columns for simplified viewing analysis
 #shuswap_df <- select(shuswap_clean, EMS_ID, MONITORING_LOCATION, COLLECTION_START, PARAMETER, RESULT_LETTER, RESULT, UNIT, SAMPLE_CLASS, UPPER_DEPTH, LOWER_DEPTH)
 
-# You can create a summary list of any column
+## You can create a summary list of any column
 #distinct(shuswap_df, MONITORING_SITE = "0500123", PARAMETER)
 #
 # # CREATE CSV OF ALL RAW CLEAN DATA
@@ -37,10 +44,10 @@
 all_data_shuswap <- read_csv("data/all_data_shuswap_clean.csv")
 
 # Add Month, Day, Year and Time columns and remove time from COLLECTION_START
-all_data_shuswap$Month <- as.character(format(all_data_shuswap$COLLECTION_START, '%b'))
-all_data_shuswap$Day <- as.character(format(all_data_shuswap$COLLECTION_START, '%d'))
-all_data_shuswap$Year <- as.character(format(all_data_shuswap$COLLECTION_START, '%Y'))
-all_data_shuswap$Time <- as.character(format(all_data_shuswap$COLLECTION_START, '%H:%M:%S'))
+all_data_shuswap$MONTH <- as.character(format(all_data_shuswap$COLLECTION_START, '%b'))
+all_data_shuswap$DAY <- as.character(format(all_data_shuswap$COLLECTION_START, '%d'))
+all_data_shuswap$YEAR <- as.character(format(all_data_shuswap$COLLECTION_START, '%Y'))
+all_data_shuswap$TIME <- as.character(format(all_data_shuswap$COLLECTION_START, '%H:%M:%S'))
 all_data_shuswap <- mutate(all_data_shuswap, COLLECTION_START = date(COLLECTION_START))
 
 
@@ -65,7 +72,6 @@ for (s in sites){
   plot(plotpoint)
 }
 
-
 # CLEANING UP SITE 0500123 - SORRENTO REACH
 #
 # Remove 4 rows of 8/21/2002 and 2/11/2003 that look like they were entered wrong at 100 ug/L. According to Kevin, these are likely metals results that got lumped into the P test results. These days are entered twice, the second entry at < MDL of 2 ug/L which would be the P MDL.
@@ -74,33 +80,18 @@ for (s in sites){
 TP_0500123 <- filter(TP, EMS_ID == "0500123")
 TP_0500123 <- TP_0500123[-c(2,4,22,115,141,172,197), ]
 
-# Remove time from COLLECTION_START and average samples (regular and repeat of surface samples) taken on the same day.
+# Average samples (regular and repeat of surface samples) taken on the same day.
 TP_0500123_avg <- TP_0500123 %>%
-  mutate(COLLECTION_START = date(COLLECTION_START)) %>%
-  group_by(COLLECTION_START) %>%
-  summarize(RESULT_ugL_avg = mean(RESULT))
-
-# Add back EMS_ID and MONITORING_LOCATION columns to avg df
-TP_0500123_avg$EMS_ID <- "0500123"
-TP_0500123_avg$MONITORING_LOCATION <- "SHUSWAP LK WEST OF SORRENTO-SORRENTO REACH"
-
-#Add month and year columns (every time there's a summarize function, you have to add back columns you want)
-TP_0500123_avg$Month <- as.character(format(TP_0500123_avg$COLLECTION_START, '%b'))
-TP_0500123_avg$Year <- as.character(format(TP_0500123_avg$COLLECTION_START, '%Y'))
+  group_by(COLLECTION_START, MONITORING_LOCATION, MONTH, DAY, YEAR, UNIT) %>%
+  summarize(RESULT_avg = mean(RESULT))
 
 # Monthly TP means
 TP_0500123_mm <- TP_0500123_avg %>%
-  group_by(Month, Year) %>%
-  summarise(RESULT_month_mean = mean(RESULT_ugL_avg))
+  group_by(COLLECTION_START, MONITORING_LOCATION, MONTH, DAY, YEAR, UNIT) %>%
+  summarise(RESULT_month_mean = mean(RESULT_avg))
 
-# Add back EMS_ID and MONITORING_LOCATION columns to mm df
-TP_0500123_mm$EMS_ID <- "0500123"
-TP_0500123_mm$MONITORING_LOCATION <- "SHUSWAP LK WEST OF SORRENTO-SORRENTO REACH"
-
-# Separate df into growing season (May - October) by adding Month and Year columns
-TP_0500123_avg$Month <- as.character(format(TP_0500123_avg$COLLECTION_START, '%b'))
-TP_0500123_avg$Year <- as.character(format(TP_0500123_avg$COLLECTION_START, '%Y'))
-TP_0500123_gs <- filter(TP_0500123_mm, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sep"| Month == "Oct")
+# Growing season monthly TP means
+TP_0500123_gs <- filter(TP_0500123_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
 
 
 # CLEANING UP SITE E206771 - SALMON ARM REACH
@@ -109,33 +100,18 @@ TP_0500123_gs <- filter(TP_0500123_mm, Month == "May"|Month == "Jun"| Month == "
 TP_E206771 <- filter(TP, EMS_ID == "E206771")
 TP_E206771 <- TP_E206771[-c(2,4,6,9,11,13,15,60,114,123,195), ]
 
-# Remove time from COLLECTION_START and average samples (regular and repeat of surface samples) taken on the same day.
+# Average samples (regular and repeat of surface samples) taken on the same day.
 TP_E206771_avg <- TP_E206771 %>%
-  mutate(COLLECTION_START = date(COLLECTION_START)) %>%
-  group_by(COLLECTION_START) %>%
-  summarize(RESULT_ugL_avg = mean(RESULT))
-
-# Add back EMS_ID and MONITORING_LOCATION columns to avg df
-TP_E206771_avg$EMS_ID <- "E206771"
-TP_E206771_avg$MONITORING_LOCATION <- "SHUSWAP LK TB # 5-SALMON ARM REACH"
-
-# Add month and year columns
-TP_E206771_avg$Month <- as.character(format(TP_E206771_avg$COLLECTION_START, '%b'))
-TP_E206771_avg$Year <- as.character(format(TP_E206771_avg$COLLECTION_START, '%Y'))
+  group_by(COLLECTION_START, MONITORING_LOCATION, EMS_ID UNIT) %>%
+  summarize(RESULT_avg = mean(RESULT))
 
 # Monthly TP means
 TP_E206771_mm <- TP_E206771_avg %>%
-  group_by(Month, Year) %>%
-  summarise(RESULT_month_mean = mean(RESULT_ugL_avg))
+  group_by(COLLECTION_START, MONITORING_LOCATION, MONTH, DAY, YEAR, UNIT) %>%
+  summarise(RESULT_month_mean = mean(RESULT_avg))
 
-# Add back EMS_ID and MONITORING_LOCATION columns to mm df
-TP_E206771_mm$EMS_ID <- "E206771"
-TP_E206771_mm$MONITORING_LOCATION <- "SHUSWAP LK TB # 5-SALMON ARM REACH"
-
-# Separate df into growing season (May - October) by adding Month and Year columns
-TP_E206771_avg$Month <- as.character(format(TP_E206771_avg$COLLECTION_START, '%b'))
-TP_E206771_avg$Year <- as.character(format(TP_E206771_avg$COLLECTION_START, '%Y'))
-TP_E206771_gs <- filter(TP_E206771_mm, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sep"| Month == "Oct")
+# Separate df into growing season (May - October)
+TP_E206771_gs <- filter(TP_E206771_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
 
 
 # CLEANING UP SITE 0500124 - SICAMOUS REACH
@@ -144,9 +120,8 @@ TP_E206771_gs <- filter(TP_E206771_mm, Month == "May"|Month == "Jun"| Month == "
 TP_0500124 <- filter(TP, EMS_ID == "0500124")
 TP_0500124 <- TP_0500124[-c(2,4,161,224), ]
 
-# Remove time from COLLECTION_START and average samples (regular and repeat of surface samples) taken on the same day.
+# Average samples (regular and repeat of surface samples) taken on the same day.
 TP_0500124_avg <- TP_0500124 %>%
-  mutate(COLLECTION_START = date(COLLECTION_START)) %>%
   group_by(COLLECTION_START) %>%
   summarise(RESULT_ugL_avg = mean(RESULT))
 
@@ -179,9 +154,8 @@ TP_0500124_gs <- filter(TP_0500124_mm, Month == "May"|Month == "Jun"| Month == "
 TP_E208723 <- filter(TP, EMS_ID == "E208723")
 TP_E208723 <- TP_E208723[-c(50,52,55,64,73), ]
 
-# Remove time from COLLECTION_START and average samples (regular and repeat of surface samples) taken on the same day.
+# Average samples (regular and repeat of surface samples) taken on the same day.
 TP_E208723_avg <- TP_E208723 %>%
-  mutate(COLLECTION_START = date(COLLECTION_START)) %>%
   group_by(COLLECTION_START) %>%
   summarize(RESULT_ugL_avg = mean(RESULT))
 
@@ -207,24 +181,30 @@ TP_E208723_avg$Month <- as.character(format(TP_E208723_avg$COLLECTION_START, '%b
 TP_E208723_avg$Year <- as.character(format(TP_E208723_avg$COLLECTION_START, '%Y'))
 TP_E208723_gs <- filter(TP_E208723_mm, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sep"| Month == "Oct")
 
-# Join clean TP average daily data from all 4 sites together
+# Join clean TP average daily data and growing season monthly means from all 4 sites together
 # *****Could these cleaning steps for done for all the sites at once, instead of each site? I think a few loops could be written here - at least for the adding the month and year columns and separating into growing season.
 TP_avg <- bind_rows(TP_0500123_avg, TP_0500124_avg, TP_E206771_avg, TP_E208723_avg)
 TP_mm_gs <- bind_rows(TP_0500123_gs, TP_0500124_gs, TP_E206771_gs, TP_E208723_gs)
 
+## Add WQO column to growing season dataframe
+TP_mm_gs$WQO <- NA
+
+## Add WQO into column by monitoring location
+TP_mm_gs$WQO[TP_mm_gs$EMS_ID == "0500123"] <- 10
+TP_mm_gs$WQO[TP_mm_gs$EMS_ID == "0500124"] <- 10
+TP_mm_gs$WQO[TP_mm_gs$EMS_ID == "E206771"] <- 15
+TP_mm_gs$WQO[TP_mm_gs$EMS_ID == "E208723"] <- 10
+
 # CREATE CSV OF CLEAN TP DATA
-#write.csv(TP_clean,'C:/R Projects/wqo_shuswap/data/TP_clean.csv', row.names = FALSE)
-#
-#
+#write.csv(TP_avg,'C:/R Projects/wqo_shuswap/data/TP_avg.csv', row.names = FALSE)
 #
 #
 ################################### TOTAL NITROGEN ###################################
-# Create a dataframe with just dissolved oxygen (DO) data for the 4 sites
 #
+# Create a dataframe with just total nitrogen data
 TN <- filter(all_data_shuswap, PARAMETER == "Nitrogen Total")
 #
 # Initial Visualization (sites object is listed above the Phosphorus code)
-#
 for (s in sites){
   TN_plots <- filter(TN, EMS_ID == s)
   plot_TN_point <- ggplot(subset(TN_plots, Year>2000), aes(x = COLLECTION_START, y = RESULT)) +
@@ -235,8 +215,41 @@ for (s in sites){
   plot(plot_TN_point)
 }
 
+# CLEANING UP SITE 0500123 - SORRENTO REACH
+#
+# Remove two rows with deep sample measurements as they are the only deep samples for this site in EMS. The deep sample values were similiar to the surface sample values.
+TN_0500123 <- filter(TN, EMS_ID == "0500123")
+TN_0500123 <- TN_0500123[-c(2, 4), ]
+
+# Average samples (regular and repeat of surface samples) taken on the same day.
+TN_0500123_avg <- TN_0500123 %>%
+  group_by(COLLECTION_START) %>%
+  summarize(RESULT_avg = mean(RESULT))
+
+# Add back EMS_ID and MONITORING_LOCATION columns to avg df
+TN_0500123_avg$EMS_ID <- "0500123"
+TN_0500123_avg$MONITORING_LOCATION <- "SHUSWAP LK WEST OF SORRENTO-SORRENTO REACH"
+
+# Add month and year columns (every time there's a summarize function, you have to add back columns you want)
+TN_0500123_avg$Month <- as.character(format(TN_0500123_avg$COLLECTION_START, '%b'))
+TN_0500123_avg$Year <- as.character(format(TN_0500123_avg$COLLECTION_START, '%Y'))
+
+# Monthly TP means
+TN_0500123_mm <- TN_0500123_avg %>%
+  group_by(Month, Year) %>%
+  summarise(RESULT_month_mean = mean(RESULT_avg))
+
+# Add back EMS_ID and MONITORING_LOCATION columns to mm df
+TN_0500123_mm$EMS_ID <- "0500123"
+TN_0500123_mm$MONITORING_LOCATION <- "SHUSWAP LK WEST OF SORRENTO-SORRENTO REACH"
+
+# Separate df into growing season (May - October) by adding Month and Year columns
+TN_0500123_avg$Month <- as.character(format(TN_0500123_avg$COLLECTION_START, '%b'))
+TN_0500123_avg$Year <- as.character(format(TN_0500123_avg$COLLECTION_START, '%Y'))
+TN_0500123_gs <- filter(TN_0500123_mm, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sep"| Month == "Oct")
+
+
 ################################## DISSOLVED OXYGEN ##################################
-# Create a dataframe with just dissolved oxygen (DO) data for the 4 sites
 #
 DO <- filter(all_data_shuswap, PARAMETER == "Oxygen Dissolved"| PARAMETER == "Dissolved Oxygen-Field")
 DO$PARAMETER <- "Dissolved Oxygen"
@@ -253,8 +266,8 @@ for (s in sites){
   plot(plot_DO_point)
 }
 
+
 ################################# CHLOROPHYLL A ######################################
-# Create a dataframe with just chlorophyll A data for the 4 sites
 #
  ChlA <- filter(all_data_shuswap, PARAMETER == "Chlorophyll A")
 
@@ -294,6 +307,8 @@ for (s in sites){
 
 ################################# E. coli ###########################################
 
+#Use 1988 data and onward as that's when MPN was changed to cfu/100mL
+#
 ecoli <- filter(all_data_shuswap, PARAMETER == "Coliform - Fecal")
 
 # Initial Visualization (sites object is listed above the Phosphorus code)
@@ -304,7 +319,7 @@ for (s in sites){
     geom_point() +
     ggtitle(s) +
     xlab("Date") +
-    ylab("Fecal Coliforms (MPN)")
+    ylab("Fecal Coliforms (CFU/100mL)")
   plot(plot_ecoli_point)
 }
 
