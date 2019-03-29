@@ -6,14 +6,25 @@
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS
+# IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
+
+
+
+## This script should include any stats we need to do on the data
+
+####################################### ALL ##########################################
+
+## Sum table for all sites and parameters
+
+
 
 ###################################### PHOSPHORUS ####################################
 
 # TP SUMMARY TABLE of clean, daily averaged data for the entire year (not monthly means)
-TP_sum_table <- TP_clean %>%
+TP_sum_table <- TP_avg %>%
   group_by(EMS_ID, MONITORING_LOCATION) %>%
   summarise(Min=min(RESULT_ugL_avg), Max=max(RESULT_ugL_avg), Median=median(RESULT_ugL_avg), n=length(RESULT_ugL_avg))
 
@@ -43,7 +54,7 @@ fish <- ggplot(subset(thompson_fish, year>1994), aes(x = year, y = number_of_fis
 plot(fish)
 ggsave(filename = "fish_thompson.png", plot = fish, path = 'C:/R Projects/wqo_shuswap/outputs', width = 9, height = 5, units= "in")
 
-# PLOT GROWING SEASON MEANS
+# PLOT GROWING SEASON MEANS (put these in loop when have WQO column)
 #
 # Sorrento Box Plot
 sorrento_point <- ggplot(subset(TP_0500123_gs, Year>1999), aes(group = Year, x = Year, y = RESULT_month_mean)) +
