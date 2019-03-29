@@ -27,7 +27,6 @@ library(lubridate)
 library(readr)
 library(directlabels)
 
-#
 # From BC Data Catalogue using bcgov/rems package.
 # Two year data, four year data, and historic data can be downloaded.
 # You can specify  which = "4yr"  to get the last four years of data
@@ -54,7 +53,9 @@ library(directlabels)
 #
 # hist_db <- attach_historic_data()
 # filtered_historic2 <- hist_db %>%
-#   select(EMS_ID, MONITORING_LOCATION, LOCATION_TYPE, COLLECTION_START, LOCATION_PURPOSE, SAMPLE_CLASS, SAMPLE_STATE, SAMPLE_DESCRIPTOR, PARAMETER_CODE, PARAMETER, ANALYTICAL_METHOD_CODE, ANALYTICAL_METHOD, RESULT_LETTER, RESULT, UNIT, METHOD_DETECTION_LIMIT) %>%
+#   select(EMS_ID, MONITORING_LOCATION, LOCATION_TYPE, COLLECTION_START, LOCATION_PURPOSE, SAMPLE_CLASS, SAMPLE_STATE,
+#   SAMPLE_DESCRIPTOR, PARAMETER_CODE, PARAMETER, ANALYTICAL_METHOD_CODE, ANALYTICAL_METHOD, RESULT_LETTER, RESULT, UNIT,
+#   METHOD_DE# TECTION_LIMIT) %>%
 #   filter(EMS_ID %in% c("E206771", "0500124", "E208723", "0500123"))
 #
 # filtered_historic2 <- collect(filtered_historic2) %>%
