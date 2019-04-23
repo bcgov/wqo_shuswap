@@ -82,12 +82,12 @@ TP_0500123 <- TP_0500123[-c(2,4,22,115,141,172,197), ]
 
 # Average samples (regular and repeat of surface samples) taken on the same day.
 TP_0500123_avg <- TP_0500123 %>%
-  group_by(COLLECTION_START, MONITORING_LOCATION, MONTH, DAY, YEAR, UNIT) %>%
+  group_by(COLLECTION_START, EMS_ID, MONTH, YEAR) %>%
   summarize(RESULT_avg = mean(RESULT))
 
 # Monthly TP means
 TP_0500123_mm <- TP_0500123_avg %>%
-  group_by(COLLECTION_START, MONITORING_LOCATION, MONTH, DAY, YEAR, UNIT) %>%
+  group_by(MONTH, YEAR, EMS_ID) %>%
   summarise(RESULT_month_mean = mean(RESULT_avg))
 
 # Growing season monthly TP means
@@ -102,12 +102,12 @@ TP_E206771 <- TP_E206771[-c(2,4,6,9,11,13,15,60,114,123,195), ]
 
 # Average samples (regular and repeat of surface samples) taken on the same day.
 TP_E206771_avg <- TP_E206771 %>%
-  group_by(COLLECTION_START, MONITORING_LOCATION, EMS_ID UNIT) %>%
+  group_by(COLLECTION_START, EMS_ID, MONTH, YEAR) %>%
   summarize(RESULT_avg = mean(RESULT))
 
 # Monthly TP means
 TP_E206771_mm <- TP_E206771_avg %>%
-  group_by(COLLECTION_START, MONITORING_LOCATION, MONTH, DAY, YEAR, UNIT) %>%
+  group_by(MONTH, YEAR, EMS_ID) %>%
   summarise(RESULT_month_mean = mean(RESULT_avg))
 
 # Separate df into growing season (May - October)
@@ -122,30 +122,16 @@ TP_0500124 <- TP_0500124[-c(2,4,161,224), ]
 
 # Average samples (regular and repeat of surface samples) taken on the same day.
 TP_0500124_avg <- TP_0500124 %>%
-  group_by(COLLECTION_START) %>%
-  summarise(RESULT_ugL_avg = mean(RESULT))
-
-# Add back EMS_ID and MONITORING_LOCATION columns to avg df
-TP_0500124_avg$EMS_ID <- "0500124"
-TP_0500124_avg$MONITORING_LOCATION <- "SHUSWAP LK OPPOSITE MARBLE PT.-SICAMOUS REACH"
-
-# Add month and year columns
-TP_0500124_avg$Month <- as.character(format(TP_0500124_avg$COLLECTION_START, '%b'))
-TP_0500124_avg$Year <- as.character(format(TP_0500124_avg$COLLECTION_START, '%Y'))
+  group_by(COLLECTION_START, EMS_ID, MONTH, YEAR) %>%
+  summarise(RESULT_avg = mean(RESULT))
 
 # Monthly TP means
 TP_0500124_mm <- TP_0500124_avg %>%
-  group_by(Month, Year) %>%
-  summarise(RESULT_month_mean = mean(RESULT_ugL_avg))
+  group_by(MONTH, YEAR, EMS_ID) %>%
+  summarise(RESULT_month_mean = mean(RESULT_avg))
 
-# Add back EMS_ID and MONITORING_LOCATION columns to monthly mean(mm) df
-TP_0500124_mm$EMS_ID <- "0500124"
-TP_0500124_mm$MONITORING_LOCATION <- "SHUSWAP LK OPPOSITE MARBLE PT.-SICAMOUS REACH"
-
-# Separate df into growing season (May - October) by adding Month and Year columns
-TP_0500124_avg$Month <- as.character(format(TP_0500124_avg$COLLECTION_START, '%b'))
-TP_0500124_avg$Year <- as.character(format(TP_0500124_avg$COLLECTION_START, '%Y'))
-TP_0500124_gs <- filter(TP_0500124_mm, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sep"| Month == "Oct")
+# Separate df into growing season (May - October)
+TP_0500124_gs <- filter(TP_0500124_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
 
 
 # CLEANING UP SITE E208723 - MAIN ARM
@@ -156,47 +142,33 @@ TP_E208723 <- TP_E208723[-c(50,52,55,64,73), ]
 
 # Average samples (regular and repeat of surface samples) taken on the same day.
 TP_E208723_avg <- TP_E208723 %>%
-  group_by(COLLECTION_START) %>%
-  summarize(RESULT_ugL_avg = mean(RESULT))
-
-# Add back EMS_ID and MONITORING_LOCATION columns to avg df
-TP_E208723_avg$EMS_ID <- "E208723"
-TP_E208723_avg$MONITORING_LOCATION <- "SHUSWAP LK OFF ARMSTRONG PT-MAIN ARM REACH"
-
-# Add month and year columns
-TP_E208723_avg$Month <- as.character(format(TP_E208723_avg$COLLECTION_START, '%b'))
-TP_E208723_avg$Year <- as.character(format(TP_E208723_avg$COLLECTION_START, '%Y'))
+  group_by(COLLECTION_START, EMS_ID, MONTH, YEAR) %>%
+  summarize(RESULT_avg = mean(RESULT))
 
 # Monthly TP means
 TP_E208723_mm <- TP_E208723_avg %>%
-  group_by(Month, Year) %>%
-  summarise(RESULT_month_mean = mean(RESULT_ugL_avg))
+  group_by(MONTH, YEAR, EMS_ID) %>%
+  summarise(RESULT_month_mean = mean(RESULT_avg))
 
-# Add back EMS_ID and MONITORING_LOCATION columns to mm df
-TP_E208723_mm$EMS_ID <- "E208723"
-TP_E208723_mm$MONITORING_LOCATION <- "SHUSWAP LK OFF ARMSTRONG PT-MAIN ARM REACH"
-
-# Separate df into growing season (May - October) and non-growing season (November to April) by adding Month and Year columns
-TP_E208723_avg$Month <- as.character(format(TP_E208723_avg$COLLECTION_START, '%b'))
-TP_E208723_avg$Year <- as.character(format(TP_E208723_avg$COLLECTION_START, '%Y'))
-TP_E208723_gs <- filter(TP_E208723_mm, Month == "May"|Month == "Jun"| Month == "Jul" |Month == "Aug"| Month == "Sep"| Month == "Oct")
+# Separate df into growing season (May - October)
+TP_E208723_gs <- filter(TP_E208723_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
 
 # Join clean TP average daily data and growing season monthly means from all 4 sites together
-# *****Could these cleaning steps for done for all the sites at once, instead of each site? I think a few loops could be written here - at least for the adding the month and year columns and separating into growing season.
 TP_avg <- bind_rows(TP_0500123_avg, TP_0500124_avg, TP_E206771_avg, TP_E208723_avg)
-TP_mm_gs <- bind_rows(TP_0500123_gs, TP_0500124_gs, TP_E206771_gs, TP_E208723_gs)
+TP_mm <- bind_rows(TP_0500123_mm, TP_0500124_mm, TP_E206771_mm, TP_E208723_mm)
+TP_gs <- bind_rows(TP_0500123_gs, TP_0500124_gs, TP_E206771_gs, TP_E208723_gs)
 
 ## Add WQO column to growing season dataframe
-TP_mm_gs$WQO <- NA
+TP_gs$WQO <- NA
 
 ## Add WQO into column by monitoring location
-TP_mm_gs$WQO[TP_mm_gs$EMS_ID == "0500123"] <- 10
-TP_mm_gs$WQO[TP_mm_gs$EMS_ID == "0500124"] <- 10
-TP_mm_gs$WQO[TP_mm_gs$EMS_ID == "E206771"] <- 15
-TP_mm_gs$WQO[TP_mm_gs$EMS_ID == "E208723"] <- 10
+TP_gs$WQO[TP_gs$EMS_ID == "0500123"] <- 10
+TP_gs$WQO[TP_gs$EMS_ID == "0500124"] <- 10
+TP_gs$WQO[TP_gs$EMS_ID == "E206771"] <- 15
+TP_gs$WQO[TP_gs$EMS_ID == "E208723"] <- 10
 
 # CREATE CSV OF CLEAN TP DATA
-#write.csv(TP_avg,'C:/R Projects/wqo_shuswap/data/TP_avg.csv', row.names = FALSE)
+write.csv(TP_avg,'C:/R Projects/wqo_shuswap/data/TP_avg.csv', row.names = FALSE)
 #
 #
 ################################### TOTAL NITROGEN ###################################
