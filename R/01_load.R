@@ -55,13 +55,17 @@ library(directlabels)
 # filtered_historic2 <- hist_db %>%
 #   select(EMS_ID, MONITORING_LOCATION, LOCATION_TYPE, COLLECTION_START, LOCATION_PURPOSE, SAMPLE_CLASS, SAMPLE_STATE,
 #   SAMPLE_DESCRIPTOR, PARAMETER_CODE, PARAMETER, ANALYTICAL_METHOD_CODE, ANALYTICAL_METHOD, RESULT_LETTER, RESULT, UNIT,
-#   METHOD_DE# TECTION_LIMIT) %>%
+#   METHOD_DETECTION_LIMIT) %>%
 #   filter(EMS_ID %in% c("E206771", "0500124", "E208723", "0500123"))
 #
 # filtered_historic2 <- collect(filtered_historic2) %>%
 #   mutate(COLLECTION_START = ems_posix_numeric(COLLECTION_START))
 #
+# # Testing
 # all_data_shuswap <- bind_ems_data(filtered_twoyear, filtered_historic2)
-#
+# addcols <- c("UPPER_DEPTH", "LOWER_DEPTH")
+# tidy_data_shuswap <- tidy_ems_data(all_data_shuswap, cols = addcols, mdl_action = "mdl")
+# all_data_clean <- clean_wqdata(tidy_data_shuswap, by = "EMS_ID", delete_outliers = FALSE)
+
 # ## CREATE CSV OF RAW DATA
 # write.csv(all_data_shuswap, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
