@@ -10,15 +10,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-## DOWNLOAD AND LOAD EMS DATA FROM DATA BC OPEN DATA OBJECT
-##
-## See rems readme file for more information: https://github.com/bcgov/rems/blob/master/README.Rmd
+################## DOWNLOAD AND LOAD EMS DATA FROM DATA BC OPEN DATA OBJECT##########################
 
-## install.packages("package name") if not already installed
+# See rems readme file for more information: https://github.com/bcgov/rems/blob/master/README.Rmd
 
-library(devtools)
+# install.packages("package name") if not already installed
+
 #install_github("bcgov/rems")
 #install_github("bcgov/wqbc", ref = "develop")
+
+# Load Packages
+library(devtools)
 library(rems)
 library(dplyr)
 library(ggplot2)
@@ -27,45 +29,35 @@ library(lubridate)
 library(readr)
 library(directlabels)
 
-# From BC Data Catalogue using bcgov/rems package.
+# Load the last 2 years of water quality data for 4 monitoring sites in Shuswap Lake from the BC Data Catalogue using bcgov/rems package.
 # Two year data, four year data, and historic data can be downloaded.
 # You can specify  which = "4yr"  to get the last four years of data
 
-# twoyear <- get_ems_data(which = "2yr", ask = TRUE)
-#
-# filtered_twoyear <- filter_ems_data(twoyear,
-#                                     emsid = c("E206771", "0500124", "E208723", "0500123"),
-#                                     #parameter = ("Barium Total"),
-#                                     #from_date = "2011/05/06",
-#                                     to_date = "2019/02/28")
-#
-# #remove_data_cache("2yr")
-#
-# # DOWNLOAD HISTORIC DATA - JUST HAVE TO RUN THIS CODE ONCE
-# #download_historic_data(ask = FALSE)
-# #
-# # Run this part if historic code below isn't working
-# # filtered_historic <- read_historic_data(
-# #                                     emsid = c("E206771", "0500124", "E208723", "0500123"),
-# #                                     #parameter = ("Barium Total"),
-# #                                     #from_date = "2011/05/06",
-# #                                     to_date = "2018/12/04")
-#
-# hist_db <- attach_historic_data()
-# filtered_historic2 <- hist_db %>%
-#   select(EMS_ID, MONITORING_LOCATION, LOCATION_TYPE, COLLECTION_START, LOCATION_PURPOSE, SAMPLE_CLASS, SAMPLE_STATE,
-#   SAMPLE_DESCRIPTOR, PARAMETER_CODE, PARAMETER, ANALYTICAL_METHOD_CODE, ANALYTICAL_METHOD, RESULT_LETTER, RESULT, UNIT,
-#   METHOD_DETECTION_LIMIT) %>%
-#   filter(EMS_ID %in% c("E206771", "0500124", "E208723", "0500123"))
-#
-# filtered_historic2 <- collect(filtered_historic2) %>%
-#   mutate(COLLECTION_START = ems_posix_numeric(COLLECTION_START))
-#
-# # Testing
-# all_data_shuswap <- bind_ems_data(filtered_twoyear, filtered_historic2)
-# addcols <- c("UPPER_DEPTH", "LOWER_DEPTH")
-# tidy_data_shuswap <- tidy_ems_data(all_data_shuswap, cols = addcols, mdl_action = "mdl")
-# all_data_clean <- clean_wqdata(tidy_data_shuswap, by = "EMS_ID", delete_outliers = FALSE)
+twoyear <- get_ems_data(which = "2yr", cols = "all")
 
-# ## CREATE CSV OF RAW DATA
-# write.csv(all_data_shuswap, 'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
+filtered_twoyear <- filter_ems_data(twoyear, emsid = c("E206771", "0500124", "E208723", "0500123"))
+
+#remove_data_cache("2yr")
+
+# DOWNLOAD HISTORIC DATA
+# If you need to download the historic data, uncomment the following line:
+#download_historic_data(ask = FALSE)
+
+# Attach the sq Lite database to R
+hist_db <- attach_historic_data()
+
+# Grab data from the 4 Shuswap Lake monitoring sites
+filtered_historic <- hist_db %>%
+  filter(EMS_ID %in% c("E206771", "0500124", "E208723", "0500123"))
+
+# Convert the database object into a regular R data object
+filtered_historic <- collect(filtered_historic) %>%
+  # Make sure the time data is in proper format
+  mutate(COLLECTION_START = ems_posix_numeric(COLLECTION_START),
+         COLLECTION_END = ems_posix_numeric(COLLECTION_END))
+
+# Combine the 2yr and the historic dataframes
+all_data_shuswap <- bind_ems_data(filtered_twoyear, filtered_historic)
+
+# CREATE CSV OF RAW DATA
+#write.csv(all_data_shuswap,'C:/R Projects/wqo_shuswap/data/all_data_shuswap.csv', row.names = FALSE)
