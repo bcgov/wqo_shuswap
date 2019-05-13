@@ -81,6 +81,8 @@ TP_0500123 <- filter(TP, EMS_ID == "0500123")
 TP_0500123 <- TP_0500123[-c(2,4,22,115,141,172,197), ]
 
 # Average samples (regular and repeat of surface samples) taken on the same day.
+# #Try and put entire TP dataframe though here.
+# #Try writing functions for WQ steps
 TP_0500123_avg <- TP_0500123 %>%
   group_by(COLLECTION_START, EMS_ID, MONTH, YEAR) %>%
   summarize(RESULT_avg = mean(RESULT))
@@ -168,7 +170,7 @@ TP_gs$WQO[TP_gs$EMS_ID == "E206771"] <- 15
 TP_gs$WQO[TP_gs$EMS_ID == "E208723"] <- 10
 
 # CREATE CSV OF CLEAN TP DATA
-write.csv(TP_avg,'C:/R Projects/wqo_shuswap/data/TP_avg.csv', row.names = FALSE)
+#write.csv(TP_avg,'C:/R Projects/wqo_shuswap/data/TP_avg.csv', row.names = FALSE)
 #
 #
 ################################### TOTAL NITROGEN ###################################
