@@ -17,11 +17,33 @@ shuswap_clean <- read_csv("data/shuswap_clean.csv")
 ############################## PHOSPHORUS ###########################################
 
 # Initial Visualization
-TP <- filter(all_data_shuswap, PARAMETER == "Phosphorus Total")
+TP <- filter(shuswap_clean, PARAMETER == "Phosphorus Total")
 
 # Change units from mg/L to ug/L
 TP <- transform(TP, RESULT = RESULT*1000)
 TP$UNIT <- "ug/L"
+
+
+*********trying to put entire TP df through these dataframe organizing steps and then I can ********clean each site. Sort by EMS ID for this trial.
+
+# Average samples taken on the same day at different depths.
+TP_avg <- TP %>%
+  group_by(EMS_ID, COLLECTION_START, MONTH, DAY, YEAR, UPPER_DEPTH, LOWER_DEPTH) %>%
+  summarize(RESULT_avg = mean(RESULT))
+
+# Monthly TP means
+TP_mm <- TP %>%
+  group_by(EMS_ID, MONTH, YEAR) %>%
+  summarise(RESULT_mm = mean(RESULT))
+
+# Growing season monthly TP means
+TP_gs <- TP_mm %>%
+  filter(TP_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
+
+
+
+
+
 
 sites <- c("E206771", "0500124", "E208723", "0500123")
 
@@ -31,7 +53,7 @@ for (s in sites){
     geom_point() +
     ggtitle(s) +
     xlab("Date") +
-    ylab("Total Phosphorus (ug/L)")
+    ylab("Total Phosphorus (µg/L)")
   plot(plotpoint)
 }
 
@@ -42,22 +64,6 @@ for (s in sites){
 # Include surface samples only (it's just most recent data that have deep water samples)
 TP_0500123 <- filter(TP, EMS_ID == "0500123")
 TP_0500123 <- TP_0500123[-c(2,4,22,115,141,172,197), ]
-
-# Average samples (regular and repeat of surface samples) taken on the same day.
-# #Try and put entire TP dataframe though here.
-# #Try writing functions for WQ steps
-TP_0500123_avg <- TP_0500123 %>%
-  group_by(COLLECTION_START, EMS_ID, MONTH, YEAR) %>%
-  summarize(RESULT_avg = mean(RESULT))
-
-# Monthly TP means
-TP_0500123_mm <- TP_0500123_avg %>%
-  group_by(MONTH, YEAR, EMS_ID) %>%
-  summarise(RESULT_month_mean = mean(RESULT_avg))
-
-# Growing season monthly TP means
-TP_0500123_gs <- filter(TP_0500123_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
-
 
 # CLEANING UP SITE E206771 - SALMON ARM REACH
 #
