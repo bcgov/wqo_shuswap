@@ -10,24 +10,43 @@ wqo_shuswap
 
 ### Usage
 
-Describe data being used (links), and how to run. Eg:
+These scripts download water quality data from the British Columbia Ministry of Environment and Climate Change Strategy's [Environmental Monitoring System Database](https://catalogue.data.gov.bc.ca/dataset/bc-environmental-monitoring-system-results "EMS Database") using `rems`.
 
 There are four core scripts that are required for the analysis, they need to be run in order:
 
--   01\_clean.R
--   02\_analysis.R
--   03\_visualize.R
--   04\_output.R
+-   1\_load.R
+-   2\_filter_and_clean.R
+-   3\_visualize.R
+-   4\_plots_and_tables.R
 
 #### Example
 
-This is a basic example which shows you how to solve a common problem:
+This set of scripts allows you to sort and visualize water quality lake data for a variety of parameters.
 
 ``` r
-## basic example code
+# Initial Visualization
+TP <- filter(shuswap_clean, PARAMETER == "Phosphorus Total")
+
+# Change units from mg/L to ug/L
+TP <- transform(TP, RESULT = RESULT*1000) 
+TP$UNIT <- "ug/L"
+
+sites <- c("E206771", "0500124", "E208723", "0500123")
+
+for (s in sites){
+  TP_plots <- filter(TP, EMS_ID == s)
+  plotpoint <- ggplot(TP_plots, aes(x = COLLECTION_START, y = RESULT)) +
+    geom_point() +
+    ggtitle(s) +
+    xlab("Date") +
+    ylab("Total Phosphorus (µg/L)")
+  plot(plotpoint)
+}
 ```
 
 ### Project Status
+
+This project is in development and always changing. 
 
 ### Getting Help or Reporting an Issue
 
