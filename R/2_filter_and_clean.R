@@ -53,11 +53,11 @@ shuswap_clean <- shuswap_clean %>%
   select(c(EMS_ID, MONITORING_LOCATION, LOCATION_TYPE, COLLECTION_START, SAMPLE_CLASS, SAMPLE_STATE, SAMPLE_DESCRIPTOR, PARAMETER, PARAMETER_CODE, RESULT_LETTER, RESULT, UNIT, METHOD_DETECTION_LIMIT, MDL_UNIT, UPPER_DEPTH, LOWER_DEPTH))
 
 # Add Month, Day, Year and Time columns and remove time from COLLECTION_START
-all_data_shuswap$MONTH <- as.character(format(all_data_shuswap$COLLECTION_START, '%b'))
-all_data_shuswap$DAY <- as.character(format(all_data_shuswap$COLLECTION_START, '%d'))
-all_data_shuswap$YEAR <- as.character(format(all_data_shuswap$COLLECTION_START, '%Y'))
-all_data_shuswap$TIME <- as.character(format(all_data_shuswap$COLLECTION_START, '%H:%M:%S'))
-all_data_shuswap <- mutate(all_data_shuswap, COLLECTION_START = date(COLLECTION_START))
+shuswap_clean$MONTH <- as.character(format(shuswap_clean$COLLECTION_START, '%b'))
+shuswap_clean$DAY <- as.character(format(shuswap_clean$COLLECTION_START, '%d'))
+shuswap_clean$YEAR <- as.character(format(shuswap_clean$COLLECTION_START, '%Y'))
+shuswap_clean$TIME <- as.character(format(shuswap_clean$COLLECTION_START, '%H:%M:%S'))
+shuswap_clean <- mutate(shuswap_clean, COLLECTION_START = date(COLLECTION_START))
 
 # CREATE CSV OF CLEAN DATA
 write.csv(shuswap_clean, 'C:/R Projects/wqo_shuswap/data/shuswap_clean.csv', row.names = FALSE)
