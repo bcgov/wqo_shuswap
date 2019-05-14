@@ -9,8 +9,14 @@
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
+#
+#
+# SCRIPT SUMMARY
+# Download all EMS data for 4 Shuswap Lake sites
+# A file containing the raw data that is loaded and filtered by later scripts
 
-################## DOWNLOAD AND LOAD EMS DATA FROM DATA BC OPEN DATA OBJECT##########################
+
+# DOWNLOAD AND LOAD EMS DATA FROM DATA BC OPEN DATA OBJECT
 
 # See rems readme file for more information: https://github.com/bcgov/rems/blob/master/README.Rmd
 
