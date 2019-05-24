@@ -12,7 +12,7 @@
 
 # SCRIPT SUMMARY
 # Filtering to:
-# Only regular samples
+# Remove blanks
 # Only fresh water
 # Remove results that are n/a
 # Remove results with q/c grade "F"
@@ -25,21 +25,28 @@
 
 # Haven't used tidy_ems_data as I have left the data at the MDL (if there's a '<", the RESULT is the MDL anyway), and I don't want to change the column names as I don't need to run the clean function.
 
+# Load raw data
+shuswap_clean <- read_csv("data/all_data_shuswap.csv")
+
 shuswap_clean <- all_data_shuswap %>%
-  # Grab only regular samples (not replicates)
-  filter(SAMPLE_CLASS == "Regular") %>%
+  # Take out blanks and Reference
+  filter(!SAMPLE_CLASS == "Blank - field", !SAMPLE_CLASS == "Reference") %>%
   # Make sure only fresh water samples
   filter(SAMPLE_STATE =="Fresh Water") %>%
   # Remove results that have 'na'
   filter(!is.na(RESULT)) %>%
   # Remove results that failed q/c
-  filter(!QA_INDEX_CODE == "F" | is.na(QA_INDEX_CODE))
+  filter(!QA_INDEX_CODE == "F" | is.na(QA_INDEX_CODE)) %>%
+  # Remove units for barometric pressure data
+  filter(!UNIT == "kPa") %>%
+  # Remove RESULTS = 0 and - from EMS system calculations (mostly N species)
+  filter(!RESULT == 0.00, !RESULT <=0)
 
 # Remove results below/above detection limit
 # Pull out the below detection limit data to investigate
-below_detect <- shuswap_clean %>%
-  filter(RESULT_LETTER == "<")
-# Investigated the above detect ... none present.
+#below_detect <- shuswap_clean %>%
+ #filter(RESULT_LETTER == "<")
+# Investigated the above detect ... none present for Shuswap data.
 #above_detect <- shuswap_clean %>%
  #filter(RESULT_LETTER == ">")
 
