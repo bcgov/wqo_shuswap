@@ -42,6 +42,7 @@ shuswap_clean <- all_data_shuswap %>%
   # Remove RESULTS = 0 and - from EMS system calculations (mostly N species)
   filter(!RESULT == 0.00, !RESULT <=0)
 
+
 # Remove results below/above detection limit
 # Pull out the below detection limit data to investigate
 #below_detect <- shuswap_clean %>%
@@ -58,6 +59,12 @@ shuswap_clean <- all_data_shuswap %>%
 shuswap_clean <- shuswap_clean %>%
   distinct() %>%
   select(c(EMS_ID, MONITORING_LOCATION, LOCATION_TYPE, COLLECTION_START, SAMPLE_CLASS, SAMPLE_STATE, SAMPLE_DESCRIPTOR, PARAMETER, PARAMETER_CODE, RESULT_LETTER, RESULT, UNIT, METHOD_DETECTION_LIMIT, MDL_UNIT, UPPER_DEPTH, LOWER_DEPTH))
+
+# View list of parameters and remove ones not needed.
+params <- distinct(shuswap_clean, PARAMETER)
+shuswap_clean <- shuswap_clean %>%
+  filter(!PARAMETER_CODE == "2107", !PARAMETER_CODE == "1120", !PARAMETER_CODE == "0003") %>%
+  filter(!grepl('-E', PARAMETER_CODE))
 
 # Add Month, Day, Year and Time columns and remove time from COLLECTION_START
 shuswap_clean$MONTH <- as.character(format(shuswap_clean$COLLECTION_START, '%b'))
