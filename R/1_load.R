@@ -26,11 +26,13 @@
 #install_github("bcgov/wqbc", ref = "develop")
 
 # Load Packages
+library(tidyr)
 library(devtools)
 library(rems)
 library(dplyr)
 library(ggplot2)
 library(wqbc)
+library(reshape)
 library(lubridate)
 library(readr)
 library(directlabels)
