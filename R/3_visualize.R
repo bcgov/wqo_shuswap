@@ -12,136 +12,101 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 # Load clean data
-shuswap_clean <- read_csv("data/shuswap_clean.csv")
+shuswap_clean <- read_csv("data/shuswap_clean.csv") %>%
+  # Select only parameters for assessing potential WQOs
+  filter(PARAMETER %in% c("Nitrogen Total", "Phosphorus Total", "Oxygen Dissolved", "Dissolved Oxygen-Field", "Chlorophyll A", "Organic Carbon Total", "Organic Carbon Dissolved","Extinction Depth", "Coliform - Fecal")) %>%
+  # Select only columns needed
+  select(EMS_ID,
+         MONITORING_LOCATION,
+         PARAMETER,
+         COLLECTION_START,
+         SAMPLE_CLASS,
+         RESULT,
+         RESULT_LETTER,
+         UNIT,
+         METHOD_DETECTION_LIMIT,
+         MDL_UNIT,
+         UPPER_DEPTH,
+         LOWER_DEPTH)
+
+# Add Month, Day, Year and Time columns and remove time from COLLECTION_START
+shuswap_clean$MONTH <- as.character(format(shuswap_clean$COLLECTION_START, '%b'))
+shuswap_clean$DAY <- as.character(format(shuswap_clean$COLLECTION_START, '%d'))
+shuswap_clean$YEAR <- as.character(format(shuswap_clean$COLLECTION_START, '%Y'))
+shuswap_clean$TIME <- as.character(format(shuswap_clean$COLLECTION_START, '%H:%M:%S'))
+shuswap_clean <- mutate(shuswap_clean, COLLECTION_START = date(COLLECTION_START))
+
+## Create loop to produce a raw data plot of the 9 parameters for all 4 sites
+
+ggplot(shuswap_clean, aes(x = COLLECTION_START, y = RESULT)) +
+  geom_point() +
+  facet_grid(PARAMETER ~ EMS_ID, scales = "free_y")
+  labs(x="Date", y="PARAMETER") +
+  ggtitle(EMS_ID)
 
 ############################## PHOSPHORUS ###########################################
 
-# Initial Visualization
-TP <- filter(shuswap_clean, PARAMETER == "Phosphorus Total")
-
+# Create total phosphorus dataframe for tidying up data
+TP <- shuswap_clean %>%
+  filter(PARAMETER == "Phosphorus Total") %>%
 # Change units from mg/L to ug/L
-TP <- transform(TP, RESULT = RESULT*1000)
+transform(RESULT = RESULT*1000)
 TP$UNIT <- "ug/L"
 
+# Create dataframe for each site and further clean
+# Remove 4 rows of 8/21/2002 and 2/11/2003 that look like they were entered wrong at 100 ug/L. According to Kevin, these are likely metals results that got lumped into the P test results. These days are entered twice, the second entry at < MDL of 2 ug/L which would be the P MDL and is correct.
+# Remove value of 20 (has a RESULT_LETTER OF < so supposed to be <MDL)
+TP_0500123 <- filter(TP, EMS_ID == "0500123")
+TP_0500123 <- TP_0500123 %>%
+  filter(!RESULT == 100, !RESULT == 20)
 
-*********trying to put entire TP df through these dataframe organizing steps and then I can ********clean each site. Sort by EMS ID for this trial.
+# Remove MDL errors of 100 and 30 ug/L. I think RESULT should be 3 ug/L and 10 ug/L.
+TP_E206771 <- filter(TP, EMS_ID == "E206771")
+TP_E206771 <- TP_E206771 %>%
+  filter(!RESULT == 100, !RESULT == 30)
 
-# Average samples taken on the same day at different depths.
+# Removed two MDL errors. MDL should be 2 ug/L not 20 so these show up with a <.
+TP_0500124 <- filter(TP, EMS_ID == "0500124")
+TP_0500124 <- TP_0500124 %>%
+  filter(!RESULT == 20)
+
+# Removed one MDL error
+TP_E208723 <- filter(TP, EMS_ID == "E208723")
+TP_E208723 <- TP_E208723 %>%
+  filter(!RESULT == 100)
+
+# Put together TP dataframe with clean TP site data
+TP <- bind_rows(TP_0500123, TP_0500124, TP_E206771, TP_E208723)
+
+# Average samples taken on the same day at different sites on different days at different depths.
 TP_avg <- TP %>%
-  group_by(EMS_ID, COLLECTION_START, MONTH, DAY, YEAR, UPPER_DEPTH, LOWER_DEPTH) %>%
-  summarize(RESULT_avg = mean(RESULT))
+  group_by(EMS_ID, COLLECTION_START, UPPER_DEPTH, LOWER_DEPTH) %>%
+  summarize(RESULT_avg = mean(RESULT)) %>%
+  ungroup()
 
 # Monthly TP means
-TP_mm <- TP %>%
-  group_by(EMS_ID, MONTH, YEAR) %>%
-  summarise(RESULT_mm = mean(RESULT))
+TP_mm <- TP_avg %>%
+  group_by(EMS_ID, date = floor_date(COLLECTION_START,"month"), UPPER_DEPTH, LOWER_DEPTH) %>%
+  summarise(RESULT_mm = mean(RESULT_avg)) %>%
+  ungroup()
+TP_mm$MONTH <- as.character(format(TP_mm$date, '%b'))
 
 # Growing season monthly TP means
-TP_gs <- TP_mm %>%
-  filter(TP_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
-
-
-
-
-
-
-sites <- c("E206771", "0500124", "E208723", "0500123")
-
-for (s in sites){
-  TP_plots <- filter(TP, EMS_ID == s)
-  plotpoint <- ggplot(TP_plots, aes(x = COLLECTION_START, y = RESULT)) +
-    geom_point() +
-    ggtitle(s) +
-    xlab("Date") +
-    ylab("Total Phosphorus (µg/L)")
-  plot(plotpoint)
-}
-
-# CLEANING UP SITE 0500123 - SORRENTO REACH
-#
-# Remove 4 rows of 8/21/2002 and 2/11/2003 that look like they were entered wrong at 100 ug/L. According to Kevin, these are likely metals results that got lumped into the P test results. These days are entered twice, the second entry at < MDL of 2 ug/L which would be the P MDL.
-# Remove value of 20 (has a < so supposed to be <MDL)
-# Include surface samples only (it's just most recent data that have deep water samples)
-TP_0500123 <- filter(TP, EMS_ID == "0500123")
-TP_0500123 <- TP_0500123[-c(2,4,22,115,141,172,197), ]
-
-# CLEANING UP SITE E206771 - SALMON ARM REACH
-#
-# Removing deep lake values and rows where the result has a result letter but the result is entered as 30 and 100 ug/L whereas I think it should be 3ug/L and 10 ug/L.
-TP_E206771 <- filter(TP, EMS_ID == "E206771")
-TP_E206771 <- TP_E206771[-c(2,4,6,9,11,13,15,60,114,123,195), ]
-
-# Average samples (regular and repeat of surface samples) taken on the same day.
-TP_E206771_avg <- TP_E206771 %>%
-  group_by(COLLECTION_START, EMS_ID, MONTH, YEAR) %>%
-  summarize(RESULT_avg = mean(RESULT))
-
-# Monthly TP means
-TP_E206771_mm <- TP_E206771_avg %>%
-  group_by(MONTH, YEAR, EMS_ID) %>%
-  summarise(RESULT_month_mean = mean(RESULT_avg))
-
-# Separate df into growing season (May - October)
-TP_E206771_gs <- filter(TP_E206771_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
-
-
-# CLEANING UP SITE 0500124 - SICAMOUS REACH
-#
-# Removed lower depth samples and a couple MDL errors
-TP_0500124 <- filter(TP, EMS_ID == "0500124")
-TP_0500124 <- TP_0500124[-c(2,4,161,224), ]
-
-# Average samples (regular and repeat of surface samples) taken on the same day.
-TP_0500124_avg <- TP_0500124 %>%
-  group_by(COLLECTION_START, EMS_ID, MONTH, YEAR) %>%
-  summarise(RESULT_avg = mean(RESULT))
-
-# Monthly TP means
-TP_0500124_mm <- TP_0500124_avg %>%
-  group_by(MONTH, YEAR, EMS_ID) %>%
-  summarise(RESULT_month_mean = mean(RESULT_avg))
-
-# Separate df into growing season (May - October)
-TP_0500124_gs <- filter(TP_0500124_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
-
-
-# CLEANING UP SITE E208723 - MAIN ARM
-#
-## Removed lower depth samples and a couple MDL errors
-TP_E208723 <- filter(TP, EMS_ID == "E208723")
-TP_E208723 <- TP_E208723[-c(50,52,55,64,73), ]
-
-# Average samples (regular and repeat of surface samples) taken on the same day.
-TP_E208723_avg <- TP_E208723 %>%
-  group_by(COLLECTION_START, EMS_ID, MONTH, YEAR) %>%
-  summarize(RESULT_avg = mean(RESULT))
-
-# Monthly TP means
-TP_E208723_mm <- TP_E208723_avg %>%
-  group_by(MONTH, YEAR, EMS_ID) %>%
-  summarise(RESULT_month_mean = mean(RESULT_avg))
-
-# Separate df into growing season (May - October)
-TP_E208723_gs <- filter(TP_E208723_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
-
-# Join clean TP average daily data and growing season monthly means from all 4 sites together
-TP_avg <- bind_rows(TP_0500123_avg, TP_0500124_avg, TP_E206771_avg, TP_E208723_avg)
-TP_mm <- bind_rows(TP_0500123_mm, TP_0500124_mm, TP_E206771_mm, TP_E208723_mm)
-TP_gs <- bind_rows(TP_0500123_gs, TP_0500124_gs, TP_E206771_gs, TP_E208723_gs)
+TP_gs <- filter(TP_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
 
 ## Add WQO column to growing season dataframe
 TP_gs$WQO <- NA
 
-## Add WQO into column by monitoring location
+## Add WQO value into new column by monitoring location
 TP_gs$WQO[TP_gs$EMS_ID == "0500123"] <- 10
 TP_gs$WQO[TP_gs$EMS_ID == "0500124"] <- 10
 TP_gs$WQO[TP_gs$EMS_ID == "E206771"] <- 15
 TP_gs$WQO[TP_gs$EMS_ID == "E208723"] <- 10
 
 # CREATE CSV OF CLEAN TP DATA
-#write.csv(TP_avg,'C:/R Projects/wqo_shuswap/data/TP_avg.csv', row.names = FALSE)
-#
-#
+write.csv(TP_avg,'C:/R Projects/wqo_shuswap/data/TP_avg.csv', row.names = FALSE)
+
+
 ################################### TOTAL NITROGEN ###################################
 #
 # Create a dataframe with just total nitrogen data
