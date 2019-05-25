@@ -66,13 +66,6 @@ shuswap_clean <- shuswap_clean %>%
   filter(!PARAMETER_CODE == "2107", !PARAMETER_CODE == "1120", !PARAMETER_CODE == "0003") %>%
   filter(!grepl('-E', PARAMETER_CODE))
 
-# Add Month, Day, Year and Time columns and remove time from COLLECTION_START
-shuswap_clean$MONTH <- as.character(format(shuswap_clean$COLLECTION_START, '%b'))
-shuswap_clean$DAY <- as.character(format(shuswap_clean$COLLECTION_START, '%d'))
-shuswap_clean$YEAR <- as.character(format(shuswap_clean$COLLECTION_START, '%Y'))
-shuswap_clean$TIME <- as.character(format(shuswap_clean$COLLECTION_START, '%H:%M:%S'))
-shuswap_clean <- mutate(shuswap_clean, COLLECTION_START = date(COLLECTION_START))
-
 # CREATE CSV OF CLEAN DATA
 write.csv(shuswap_clean, 'C:/R Projects/wqo_shuswap/data/shuswap_clean.csv', row.names = FALSE)
 
