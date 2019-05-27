@@ -30,14 +30,13 @@ shuswap_clean <- read_csv("data/shuswap_clean.csv") %>%
          LOWER_DEPTH)
 
 # Add Month, Day, Year and Time columns and remove time from COLLECTION_START
-shuswap_clean$MONTH <- as.character(format(shuswap_clean$COLLECTION_START, '%b'))
-shuswap_clean$DAY <- as.character(format(shuswap_clean$COLLECTION_START, '%d'))
-shuswap_clean$YEAR <- as.character(format(shuswap_clean$COLLECTION_START, '%Y'))
-shuswap_clean$TIME <- as.character(format(shuswap_clean$COLLECTION_START, '%H:%M:%S'))
+# shuswap_clean$MONTH <- as.character(format(shuswap_clean$COLLECTION_START, '%b'))
+# shuswap_clean$DAY <- as.character(format(shuswap_clean$COLLECTION_START, '%d'))
+# shuswap_clean$YEAR <- as.character(format(shuswap_clean$COLLECTION_START, '%Y'))
+# shuswap_clean$TIME <- as.character(format(shuswap_clean$COLLECTION_START, '%H:%M:%S'))
 shuswap_clean <- mutate(shuswap_clean, COLLECTION_START = date(COLLECTION_START))
 
-## Create loop to produce a raw data plot of the 9 parameters for all 4 sites
-
+# Create loop to produce a raw data plot of the 9 parameters for all 4 sites
 ggplot(shuswap_clean, aes(x = COLLECTION_START, y = RESULT)) +
   geom_point() +
   facet_grid(PARAMETER ~ EMS_ID, scales = "free_y")
@@ -80,16 +79,16 @@ TP <- bind_rows(TP_0500123, TP_0500124, TP_E206771, TP_E208723)
 
 # Average samples taken on the same day at different sites on different days at different depths.
 TP_avg <- TP %>%
-  group_by(EMS_ID, COLLECTION_START, UPPER_DEPTH, LOWER_DEPTH) %>%
+  group_by(EMS_ID, MONITORING_LOCATION, COLLECTION_START, UPPER_DEPTH, LOWER_DEPTH) %>%
   summarize(RESULT_avg = mean(RESULT)) %>%
   ungroup()
 
 # Monthly TP means
 TP_mm <- TP_avg %>%
-  group_by(EMS_ID, date = floor_date(COLLECTION_START,"month"), UPPER_DEPTH, LOWER_DEPTH) %>%
+  group_by(EMS_ID, COLLECTION_START = floor_date(COLLECTION_START,"month"), MONITORING_LOCATION, UPPER_DEPTH, LOWER_DEPTH) %>%
   summarise(RESULT_mm = mean(RESULT_avg)) %>%
   ungroup()
-TP_mm$MONTH <- as.character(format(TP_mm$date, '%b'))
+TP_mm$MONTH <- as.character(format(TP_mm$COLLECTION_START, '%b'))
 
 # Growing season monthly TP means
 TP_gs <- filter(TP_mm, MONTH == "May"| MONTH == "Jun"| MONTH == "Jul" | MONTH == "Aug"| MONTH == "Sep"| MONTH == "Oct")
@@ -104,7 +103,7 @@ TP_gs$WQO[TP_gs$EMS_ID == "E206771"] <- 15
 TP_gs$WQO[TP_gs$EMS_ID == "E208723"] <- 10
 
 # CREATE CSV OF CLEAN TP DATA
-write.csv(TP_avg,'C:/R Projects/wqo_shuswap/data/TP_avg.csv', row.names = FALSE)
+#write.csv(TP_avg,'C:/R Projects/wqo_shuswap/data/TP_avg.csv', row.names = FALSE)
 
 
 ################################### TOTAL NITROGEN ###################################
