@@ -4,6 +4,7 @@ Add a project state badge
 See <https://github.com/BCDevExchange/Our-Project-Docs/blob/master/discussion/projectstates.md> 
 If you have bcgovr installed and you use RStudio, click the 'Insert BCDevex Badge' Addin.
 -->
+[![Lifecycle:Stable](https://img.shields.io/badge/Lifecycle-Stable-97ca00)](<Redirect-URL>)
 
 wqo_shuswap
 ============================
